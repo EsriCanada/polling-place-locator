@@ -1,0 +1,510 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset=utf-8>
+    <!--
+     |
+     |ArcGIS for Canadian Municipalities / ArcGIS pour les municipalités canadiennes
+     |Polling Place Locator v10.2.0 / Localisateur de bureau de scrutin v10.2.0
+     |This file was modified by Esri Canada - Copyright 2013 Esri Canada
+     |
+     | Version 10.2
+     | Copyright 2012 Esri
+     |
+     | Licensed under the Apache License, Version 2.0 (the "License");
+     | you may not use this file except in compliance with the License.
+     | You may obtain a copy of the License at
+     |
+     |    http://www.apache.org/licenses/LICENSE-2.0
+     |
+     | Unless required by applicable law or agreed to in writing, software
+     | distributed under the License is distributed on an "AS IS" BASIS,
+     | WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     | See the License for the specific language governing permissions and
+     | limitations under the License.
+    -->
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title></title>
+    <link rel="shortcut icon" href="images/appIcon.ico" />
+    <link rel="apple-touch-icon" href="images/EPPIcon.png" />
+    <link rel="apple-touch-icon-precomposed" href="images/EPPIcon.png">
+    <link id="stylesheet" href='http://serverapi.arcgisonline.com/jsapi/arcgis/3.5/js/dojo/dojox/mobile/themes/iPhone/iPhone.css'
+        rel='stylesheet' />
+    <link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.5/js/esri/css/esri.css" />
+    <link href="styles/electionPollingPlace.css" rel="stylesheet" type="text/css" />
+    <link rel="Stylesheet" id="dynamicStyleSheet" />
+    <script type="text/javascript">
+           var dojoConfig = {
+            async: false,
+            parseOnLoad: true,
+            mblHideAddressBar: false,
+            packages:[
+                {name:"js",location:location.pathname.replace(/\/[^/]+$/, '') + '/js'}
+            ]
+        };
+    </script>
+    <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/3.5compact"></script>
+    <script src="js/infoWindow.js" type="text/javascript"></script>
+    <script type="text/javascript" src="js/baseMapGallery.js"></script>
+    <script src="js/modernizr-2.5.3.js" type="text/javascript"></script>
+    <script type="text/javascript" src="js/route.js"></script>
+    <script type="text/javascript" src="js/locator.js"></script>
+    <script type="text/javascript" src="js/utils.js"></script>
+    <script type="text/javascript" src="js/result.js"></script>
+    <script src="js/webmap.js" type="text/javascript"></script>
+    <script src="js/homePage.js" type="text/javascript"></script>
+	<script src="js/internationalization.js" type="text/javascript"></script> <!--CanMod-->
+	<script type="text/javascript">
+		//Warning for IE 7 or lower
+		var ver = -1;
+		if (navigator.appName == 'Microsoft Internet Explorer') {
+			var ua = navigator.userAgent;
+			var re = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+			if (re.exec(ua) != null) {ver = parseFloat( RegExp.$1 );}
+			if (ver != -1 && ver < 7.0) {
+				alert("ENGLISH:\nInternet Explorer " + ver + " is not compatible with this application. Please upgrade to Internet Explorer 7 or higher; or use Firefox, Chrome or Safari.\n\nFRANÇAIS:\nInternet Explorer " + ver + " n'est pas compatible avec cet application. Veuillez mettre à jour Internet Explorer (version 7 ou plus) ou utilisez Firefox, Chrome ou Safari.");
+			}
+		}
+	</script>
+</head>
+<body onorientationchange="orientationChanged();">
+    <div id="divMainContainer" style="width: 100%; height: 100%;" dojotype="dojox.mobile.View"
+        selected="true">
+        <div id="map" style="width: 100%; height: 100%;">
+        </div>
+    </div>
+	<!--CanMod: Div tag to contain zoom in alert-->
+	<div id="zoomInAlert" class="floatInfo">
+		<img src="images/arrow_small.png" style="vertical-align:-2px;" alt="<-- ">
+	</div>
+    <div id="divSplashScreenContainer" class="divSplashScreenContainer" style="display: none;">
+        <table style="width: 100%; height: 100%;">
+            <tr align="center" valign="middle">
+                <td>
+                    <div id="divSplashScreenContent" class="hideContainer divSplashScreenContent">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td>
+                                    <div id="divSplashContainer" class="divSplashContainer" style="margin-top: 10px;">
+                                        <div id="divSplashContent" class="divSplashContent">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center">
+                                    <div style="width: 95px; margin-top: 10px" class="customButton" onclick="HideSplashScreenMessage();">
+										OK
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="divLogo" class="divLogo">
+        <table style="width: 100%; height: 100%;">
+            <tr>
+                <td>
+                    <img id="imgApp" class="imgApp" />
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="divApplicationHeader" align="right">
+        <table cellpadding="0" cellspacing="0" class="tableHeader">
+            <tr>
+                <td id="lblAppName" class="lblAppName" align="left">
+				<div id="lblAppNameText"></div>
+                </td>
+                <td align="right" style="width:350px;">
+                    <table>
+                        <tr>
+							<!--CanMod: Td0 is holds the polling station switch button when enabled and not mobile-->
+							<td align="center" id="Td0" class="tdHeaderWithText"></td>
+                            <td align="center" id="Td1" class="tdHeader">
+                                <img alt="Settings" src="images/locate.png" class="imgOptions" title="Search" onclick="ShowLocateContainer();"
+                                    style="cursor: pointer" />
+                            </td>
+                            <td align="center" id="tdGeolocation" class="tdHeader">
+                                <img alt="Settings" src="images/imgGeolocation.png" class="imgOptions" title="Locate"
+                                    onclick="ShowMyLocation();" style="cursor: pointer" />
+                            </td>
+                            <td align="center" id="tdBaseMap">
+                            </td>
+                            <td align="center" class="tdHeader">
+                                <img id="imgShare" src="images/imgSocialMedia.png" class="imgOptions" title="Share" onclick="ShareLink(true);"
+                                    style="cursor: pointer" /> <!--CanMod-->
+                            </td>
+                            <td align="center" id="help" class="tdHeader">
+                                <img src="images/help.png" title="Help" id="imgHelp" class="imgOptions" style="cursor: pointer" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="divAddressContainer" align="center" class="divAddressContainer hideContainerHeight"
+        style="display: none">
+        <table style="width: 100%; height: 100%;">
+            <tr align="center" valign="middle">
+                <td>
+                    <div id="divAddressHolder" class="hideContainerHeight divAddressHolder">
+                        <div id="divAddressContent" class="divAddressContent">
+                            <table class="tblHeader" style="width: 100%;">
+                                <tr style="height: 30px;" align="center" valign="top">
+                                    <td id="searchTitle" class="tdHeader" align="left" valign="middle" style="padding-left: 8px;">
+                                        Search Address
+                                    </td>
+                                    <td style="width: 10%;" align="right">
+                                        <img src="images/close.png" class="imgOptions" title="Close" style="cursor: pointer;
+                                            padding: 0px" onclick="HideAddressContainer();" />
+                                    </td>
+                                </tr>
+                            </table>
+                            <div id="divAddressResultContainer" style="margin: 5px;">
+                                <table style="color: #fff; width: 100%;">
+                                    <tr>
+                                        <td>
+                                            <div id="divAddressPlaceHolder" class="divAddressPlaceHolder" align="left">
+                                                <input type="text" id="txtAddress" class="txtAddress" onfocus="if(this.setSelectionRange)this.setSelectionRange(this.value.length, this.value.length);" />
+                                                <img src="images/locate.png" id="imgLocate" class="imgLocate" style="cursor: pointer"
+                                                    title="Locate" onclick="LocateAddress();" />
+                                            </div>
+                                            <div id="divAddressList" class="divAddressList">
+                                                <div id="divAddressScrollContainer" class="divAddressScrollContainer" align="left">
+                                                    <div id="divAddressScrollContent" class="divAddressScrollContent" style="height: 165px">
+                                                        <table id="tblAddressResults" cellpadding="0" cellspacing="2" style="width: 100%;">
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <table style="height: 100%; width: 100%;">
+                                                <tr>
+                                                    <td align="center">
+                                                        <img id="imgSearchLoader" src="images/loader.gif" class="imgSearchLoader" />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="divLayerContainer" class="divLayerContainer hideContainerHeight">
+        <div id="divLayerHolder" class="divLayerHolder">
+            <div id="divLayerContainerHolder" style="position: relative">
+                <div id="divLayerContentHolder" class="divLayerContentHolder" style="position: absolute;
+                    overflow: hidden">
+                    <div id="layerList">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="divAppContainer" class="divAppContainer hideContainerHeight">
+        <div id="divAppHolder" class="divAppHolder">
+            <div id="divAppContent">
+                <table cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td>
+                            <table cellpadding="2" cellspacing="2">
+                                <tr>
+                                    <td id="shareTitle" align="center" colspan="3" style="color: white;">
+                                        Share this map
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 40px;" align="center" id="tdFacebook"> <!--CanMod-->
+                                        <img title="Facebook" class="imgShare" id="imgFacebook" src="images/img_facebook.png"
+                                            onclick="Share('facebook')" />
+                                    </td>
+                                    <td style="width: 40px;" align="center" id="tdTwitter"> <!--CanMod-->
+                                        <img title="Twitter" class="imgShare" id="imgTwitter" src="images/img_twitter.png"
+                                            onclick="Share('twitter')" />
+                                    </td>
+                                    <td style="width: 40px;" align="center" id="tdMail"> <!--CanMod-->
+                                        <img title="Email" class="imgShare" id="imgMail" src="images/img_email.png" onclick="Share('mail')" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="showHide" class="showHide" style="bottom: 0px">
+        <table cellpadding="0" cellspacing="0" style="margin-left: 45px;">
+            <tr>
+                <td>
+                    <table cellpadding="0" cellspacing="0" style="height: 100%;">
+                        <tr>
+                            <td>
+                                <div id="divPollingPlaceDetailsHeader" align="center" class="divDefaultHeader" onclick="ShowPollingPlaceDetails();"
+                                    style="display: none;">
+                                    <table style="height: 100%; width: 160px;">
+                                        <tr>
+                                            <td>
+                                                Polling Place
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </td>
+                            <td style="width: 5px;">
+                            </td>
+                            <td>
+                                <div id="divElectedOfficialsHeader" class="divDefaultHeader" onclick="ElectedOfficials();"
+                                    style="display: none;">
+                                    <table style="height: 100%; width: 160px;">
+                                        <tr>
+                                            <td>
+                                                Elected Officials
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="width: 5px;">
+                </td>
+                <td align="right">
+                    <div id="divImageBackground" class="divShowHeader" style="display: none;">
+                        <div id="divImage">
+                            <table style="width: 100%; height: 100%">
+                                <tr>
+                                    <td align="center">
+                                        <img id="imgToggleResults" state="minimized" class="imgShare" src="images/up.png"
+                                            style="cursor: pointer;" onclick="ShowHideResult(this);"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </td>
+				<!--CanMod: Addition of print button to bottom bar-->
+				<td style="width: 5px;">
+                </td>
+				<td align="right">
+                    <div id="divImageBackgroundPrint" class="divShowHeader" style="display: none;">
+                        <div id="divImagePrint">
+                            <table style="width: 40px; height: 100%">
+                                <tr>
+                                    <td align="center">
+                                        <img id="imgPrint" class="imgShare" src="images/print.png" style="cursor: pointer;" onclick="PrepareMapPrintout();"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </td>
+				<!--CanMod End-->
+            </tr>
+        </table>
+    </div>
+    <div id="divGradient" class="divGradient hideBottomContainerHeight">
+        <div class="transparentBackground" style="height: 200px">
+            <table style="width: 100%; height: 100%;">
+                <tr>
+                    <td align="left" style="width: 37px;">
+                        <div id="OfficeLeftArrow" style="z-index: 1000; display: none;">
+                            <img src="images/arrLeft.png" style="cursor: pointer; vertical-align: middle;" onclick="SlideOfficeLeft();"
+                                class="imgShare" />
+                        </div>
+                    </td>
+                    <td>
+                        <div id="divOfficeData" class="divOfficeData">
+                            <div id="carouselOfficescroll" class="carouselOfficescroll">
+                                <div id="divOfficeDataContainer" style="padding-top: 5px;">
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td align="right" style="width: 37px;">
+                        <div id="OfficeRightArrow" style="z-index: 1000; display: block">
+                            <img src="images/arrRight.png" style="cursor: pointer; vertical-align: middle;" onclick="SlideOfficeRight();"
+                                class="imgShare" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="divPollingDetails" class="divPollingDetails hideBottomContainerHeight">
+        <div class="transparentBackground" style="height: 200px">
+            <table style="width: 100%; height: 100%;">
+                <tr>
+                    <td align="left" style="width: 37px;">
+                        <div id="PollingLeftArrow" style="z-index: 1000; display: none;">
+                            <img src="images/arrLeft.png" style="cursor: pointer; vertical-align: middle;" onclick="SlideLeft();"
+                                class="imgShare" />
+                        </div>
+                    </td>
+                    <td>
+                        <div id="divPollingData" class="divPollingData">
+                            <div id="carouselscroll" class="carouselscroll">
+                                <div id="divPollingPlaceDataContainer" style="padding-top: 5px;">
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td align="right" style="width: 37px;">
+                        <div id="PollingRightArrow" style="z-index: 1000; display: block">
+                            <img src="images/arrRight.png" style="cursor: pointer; vertical-align: middle;" onclick="SlideRight();"
+                                class="imgShare" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id='divTemplate' class='divDetails'>
+        <div id="divDetailsHeader" class='divDetailsHeader' style="width: 100%; position: relative;">
+            <table style="height: 100%; width: 100%">
+                <tr>
+                    <td>
+                        <span class="spanHeader"></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class='divContentStyle'>
+            <div class='divContentStyle'>
+            </div>
+        </div>
+    </div>
+    <div id="divInfoContainer" align="center" class="divInfoContainer opacityHideAnimation">
+        <table style="width: 100%; height: 100%;">
+            <tr align="center" valign="middle">
+                <td>
+                    <div align="left" id="divInfoContent" class="hideContainer divInfoContent">
+                        <table id="tblHeader" class="infotblHeader" style="width: 100%; padding: 1px" cellpadding="0"
+                            cellspacing="0">
+                            <tr style="height: 30px;" align="center" valign="top">
+                                <td align="left" id="tdLabel" valign="middle" style="padding-left: 7px; width: 98%">
+                                    <span id="tdInfoHeader" class="tdInfoHeader"></span>
+                                </td>
+                                <td id="tdImages">
+                                    <table cellpadding="0" cellspacing="0" align="right">
+                                        <tr>
+                                            <td id="tdDirections" align="right">
+                                                <img class="infoOptions" id="imgDirections" onclick="ShowInfoDirectionsView();" />
+                                            </td>
+                                            <td id="tdComments" align="right">
+                                                <img src="images/comments.png" class="infoOptions" title="Comments" id="imgComments"
+                                                    onclick="ShowCommentsView();" />
+                                            </td>
+                                            <td align="right">
+                                                <img src="images/close.png" class="infoOptions" title="Close" style="cursor: pointer;"
+                                                    onclick="HideInfoContainer();" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                        <div id="divInfoDetails" class="divInfoDetails" style="color: #fff;">
+                            <div id="divInfoDetailsScroll" class="divInfoDetailsScroll">
+                                <table id="tblInfoDetails" cellpadding="0" style="width: 100%; padding-top: 5px;
+                                    padding-left: 2px">
+                                </table>
+                            </div>
+                        </div>
+                        <div id="divInfoDirections" class="divInfoDirections">
+                            <div id="divInfoDirectionsScroll" class="divInfoDirectionsScroll">
+                            </div>
+                        </div>
+                        <div id="divInfoComments" class="divInfoComments" style="color: #fff; display: none;">
+                            <div id="divCommentsHeader" style="margin-top: 10px; margin-right: 10px; border-bottom: #A5A5A5 2px solid;
+                                height: 20px;">
+                                Comments
+                            </div>
+                            <div align="left" id="divCommentsView">
+                                <table style="height: 35px; cursor: pointer;" onclick="ShowAddCommentsView();">
+                                    <tr align="left">
+                                        <td style="width: 37px;">
+                                            <img title="" src="images/addcomment.png" class="imgOptions">
+                                        </td>
+                                        <td>
+                                            Add Comment
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id="divCommentsList">
+                                <div id="divCommentsContainer" class="divCommentsContainer">
+                                    <div id="divcmtscontent" class="divCommentsContent" style="overflow: hidden">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="divAddComment" style="display: none; margin: 5px;">
+                                <div id="divCmtIpContainer" style="position: relative; overflow: hidden;">
+                                    <div id="divCmtIpContent" style="position: absolute; overflow: hidden; width: 95%">
+                                        <table id="tblComment" style="margin-left: 7px; margin-top: 15px;" cellpadding="0"
+                                            cellspacing="0">
+                                            <tr valign="top">
+                                                <td>
+                                                    <textarea placeholder="Enter comment" maxlength="250" class="txtArea" id="txtComments"
+                                                        onkeypress="if(dojo.isIE){return imposeMaxLength(this, 249);}else{return imposeMaxLength(this, 250);}"></textarea>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4" valign="middle" align="left" style="height: 20px;">
+                                                    <span id="commentError" style="display: none; color: Yellow; margin-top: 3px; word-wrap: break-word;">
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" colspan="4">
+                                                    <table>
+                                                        <tr>
+                                                            <td>
+                                                                <div style="width: 95px;" class="customButton" id="btnAddComments" onclick="AddComment();"><!--CanMod-->
+                                                                    Submit
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div id="btnCancelComments" style="width: 95px;" class="customButton" onclick="ResetCommentValues();"> <!--CanMod-->
+                                                                    Cancel
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="divLoadingIndicator" class="divLoadingIndicator" style="display: block;">
+        <table style="width: 100%; height: 100%;">
+            <tr align="center" valign="middle">
+                <td>
+                    <img src="images/loader.gif" />
+                </td>
+            </tr>
+        </table>
+    </div>
+		<!--CanMod:div from iFrame printing-->
+	<div id="printWindow"><span id="printHeader"></span><img src="images/close.png" id="printClose" onclick="closePrint();">
+		<div id="printContainer" style="background-color:white; color:black; margin-top:5px;"></div>
+	</div>
+</body>
+</html>

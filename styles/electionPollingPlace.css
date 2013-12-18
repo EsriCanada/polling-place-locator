@@ -1,0 +1,829 @@
+﻿/*
+ |
+ |ArcGIS for Canadian Municipalities / ArcGIS pour les municipalités canadiennes
+ |Polling Place Locator v10.2.0 / Localisateur de bureau de scrutin v10.2.0
+ |This file was modified by Esri Canada - Copyright 2013 Esri Canada
+ |
+ | Version 10.2
+ | Copyright 2012 Esri
+ |
+ | Licensed under the Apache License, Version 2.0 (the "License");
+ | you may not use this file except in compliance with the License.
+ | You may obtain a copy of the License at
+ |
+ |    http://www.apache.org/licenses/LICENSE-2.0
+ |
+ | Unless required by applicable law or agreed to in writing, software
+ | distributed under the License is distributed on an "AS IS" BASIS,
+ | WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ | See the License for the specific language governing permissions and
+ | limitations under the License.
+ */
+/* This file contains the common style settings for "Election Polling Place" template */
+/* Use this file to perform the following: */
+
+/* 1.  Set the body styles                      - { Style(s) to look for: html, body } */
+/* 2.  Set styles for splash screen             - { Style(s) to look for: divSplashScreenContainer,divSplashScreenContent,divSplashScreenContainer,divSplashContent,
+                                                                          customButton,customButtonInner } */
+/* 3.  Set the styles for animations            - { Style(s) to look for: slideTransition,hideBottomContainer,showBottomContainer,hideContainer,showContainer,
+                                                                          hideContainerHeight,showContainerHeight,opacityHideAnimation,esriLogo}*/
+/* 4.  Set the styles for share container       - { Style(s) to look for: divAppContainer,divAppHolder}*/
+/* 5.  Set the styles for application header    - { Style(s) to look for: lblAppName,imgOptions,tableHeader,imgApplication,divApplicationHeader,divLogo}*/
+/* 6.  Set the styles for search container      - { Style(s) to look for: divAddressScrollContainer,divAddressScrollContent,tblHeader,divAddressPlaceHolder,txtAddress,
+                                                                          imgLocate,divAddressList,bottomborder}*/
+/* 7.  Set the styles for bottom panel          - { Style(s) to look for: divGradient,divPollingDetails,divSegmentContainer,divDefaultHeader,spanHeader,
+                                                                          divContentStyle,divSelectedHeader,divShowHeader,divDetailsHeader,divSegmentContainer,
+                                                                          carouselOfficescroll,carouselScroll,divPollingData,
+                                                                          divOfficeData}*/
+/* 9.  Set the styles for info window           - { Style(s) to look for: divInfoWindowContainer,divTriangle,dj_ie .divInfoWindowContainer,
+                                                                          divInfoWindowContainer .container,imgInfoWindow,divInfoWindowContainer .content,
+                                                                          divInfoWindowContainer .title,imgArrow}*/
+/* 10. Set the styles for esri slider           - { Style(s) to look for: esriSimpleSlider}*/
+/* 11. Set the styles for loading indicator     - { Style(s) to look for: divLoadingIndicator}*/
+
+
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/* Styles for body*/
+
+body, html
+{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Verdana !important;
+    overflow: hidden;
+    color: White;
+    visibility: visible !important;
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/* Styles for splash screen*/
+
+.divSplashScreenContainer
+{
+    top: 0px;
+    left: 0px;
+    background: rgba(0,0,0,0.65);
+    -pie-background: rgba(0,0,0,0.65);
+    behavior: url("styles/PIE.htc");
+    position: absolute;
+    z-index: 100000;
+    width: 100%;
+    height: 100%;
+}
+
+.divSplashScreenContent
+{
+    z-index: 1000;
+    background-color: black;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 0 10px #fff;
+    -moz-box-shadow: 0 0 10px #fff;
+    -o-box-shadow: 0 0 10px #fff;
+    box-shadow: 0 0 10px #fff;
+    behavior: url("styles/PIE.htc");
+    text-align: left;
+}
+
+.divSplashContainer
+{
+    overflow: hidden;
+    position: relative;
+}
+
+.divSplashContent
+{
+    padding-left: 10px;
+    overflow: hidden;
+    width: 90%;
+}
+
+.customButton
+{
+    border: none;
+    color: #fff;
+    cursor: pointer;
+	border: 2px solid white;
+    border-radius: 5px;
+    overflow: hidden;
+	font-weight: 700;
+	padding: 5px;
+	text-align: center;
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/*animations */
+
+.showHide
+{
+    color: #ffffff;
+    position: absolute;
+    z-index: 1005;
+    overflow: hidden;
+    -webkit-transition: bottom 0.5s ease-in;
+    -moz-transition: bottom 0.5s ease-in;
+    -o-transition: bottom 0.5s ease-in;
+    transition: bottom 0.5s ease-in;
+}
+
+.showContainer
+{
+    -webkit-transition: All 0.5s ease-in;
+    -moz-transition: All 0.5s ease-in;
+    -o-transition: All 0.5s ease-in;
+    transition: All 0.5s ease-in;
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+}
+
+.hideContainer
+{
+    -webkit-transition: All 0.5s ease-in;
+    -moz-transition: All 0.5s ease-in;
+    -o-transition: All 0.5s ease-in;
+    transition: All 0.5s ease-in;
+    -webkit-transform: scale(0);
+    -moz-transform: scale(0);
+    -o-transform: scale(0);
+    transform: scale(0);
+}
+
+.opacityHideAnimation
+{
+    visibility: hidden;
+    opacity: 0;
+    -webkit-transition: visibility 0s linear 0.5s, opacity 0.5s ease-in;
+    -moz-transition: visibility 0s linear 0.5s, opacity 0.5s ease-in;
+    -o-transition: visibility 0s linear 0.5s, opacity 0.5s ease-in;
+    transition: visibility 0s linear 0.5s, opacity 0.5s ease-in;
+}
+
+.hideContainerHeight
+{
+    overflow: hidden;
+    -webkit-transition: height 0.5s ease-in;
+    -moz-transition: height 0.5s ease-in;
+    -o-transition: height 0.5s ease-in;
+    transition: height 0.5s ease-in;
+    height: 0px;
+}
+
+.showContainerHeight
+{
+    overflow: hidden;
+    -webkit-transition: height 0.5s ease-in;
+    -moz-transition: height 0.5s ease-in;
+    -o-transition: height 0.5s ease-in;
+    transition: height 0.5s ease-in;
+    height: 100%;
+}
+
+.hideBottomContainerHeight
+{
+    overflow: hidden;
+    -webkit-transition: height 0.5s ease-in;
+    -moz-transition: height 0.5s ease-in;
+    -o-transition: height 0.5s ease-in;
+    transition: height 0.5s ease-in;
+    height: 0px;
+}
+
+.showBottomContainerHeight
+{
+    overflow: hidden;
+    -webkit-transition: height 0.5s ease-in;
+    -moz-transition: height 0.5s ease-in;
+    -o-transition: height 0.5s ease-in;
+    transition: height 0.5s ease-in;
+    height: 200px;
+}
+
+
+.slideBottomContainerHeight
+{
+    -webkit-transition: height 0.5s ease-in;
+    -moz-transition: height 0.5s ease-in;
+    -o-transition: height 0.5s ease-in;
+     transition: height 0.5s ease-in;
+}
+
+.esriLogo
+{
+    bottom:10px;
+    -webkit-transition: bottom 0.5s ease-in;
+    -moz-transition: bottom 0.5s ease-in;
+    -o-transition: bottom 0.5s ease-in;
+    transition: bottom 0.5s ease-in;
+    z-index:1006 !important;
+}
+
+.slidePanel
+{
+    -webkit-transition: left 0.5s ease-in;
+    -moz-transition: left 0.5s ease-in;
+    -o-transition: left 0.5s ease-in;
+    transition: left 0.5s ease-in;
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/*Share Container Styles*/
+
+.divAppContainer
+{
+    position: absolute;
+    z-index: 1000;
+    top: 60px;
+    right: 15px;
+}
+
+.divAppHolder
+{
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    background: rgb(56,164,69); /*CanMod rgba(0,0,0,0.9)*/
+    -pie-background: rgb(56,164,69); /*CanMod rgba(0,0,0,0.9)*/
+    behavior: url("styles/PIE.htc");
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/* Header Styles*/
+
+.tableHeader
+{
+    width: 100%;
+    height: 100%;
+}
+
+.imgOptions
+{
+    height: 30px;
+    width: 30px;
+}
+
+.imgApp
+{
+    width: 64px;
+}
+
+.divLogo
+{
+    position: absolute !important;
+    top: 0px;
+    left: 0px;
+    width: 75px;
+    height: 75px;
+    z-index: 1006;
+    display: none;
+}
+
+.divApplicationHeader
+{
+    vertical-align: middle;
+    background: rgb(56,164,69); /*CanMod: 0,0,0,0.9*/
+    -pie-background: rgb(56,164,69); /*CanMod: 0,0,0,0.9*/
+    behavior: url("styles/PIE.htc");
+    top: 0px;
+    height: 45px; /*CanMod*/
+    width: 100%;
+    position: absolute;
+    z-index: 1005;
+    overflow: hidden;
+    font-size: 24px;
+}
+
+.lblAppName
+{
+    padding-left: 10px; /*CanMod*/
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/*AddressContainer Styles*/
+
+.divAddressScrollContainer
+{
+    overflow: hidden;
+    position: relative;
+}
+
+.divAddressScrollContent
+{
+    overflow: hidden;
+    width: 93%;
+    color:White;
+}
+
+.tblHeader
+{
+     background-color: #303030;
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    -moz-border-radius-bottomleft: 0px;
+    -moz-border-radius-bottomright: 0px;
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 0px;
+    -webkit-border-bottom-right-radius: 0px;
+     border-radius: 10px 10px 0px 0px;
+    border-bottom:gray 1px solid;
+    behavior: url("styles/PIE.htc");
+}
+
+.infotblHeader
+{
+     background-color: #303030;
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    -moz-border-radius-bottomleft: 0px;
+    -moz-border-radius-bottomright: 0px;
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 0px;
+    -webkit-border-bottom-right-radius: 0px;
+     border-radius: 10px 10px 0px 0px;
+    border-bottom:gray 1px solid;
+}
+
+.divAddressPlaceHolder
+{
+    border: 1px solid #242424;
+    background-color: #333333;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    position: relative;
+}
+
+.txtAddress
+{
+    background-color: #333333;
+    color: #fff;
+    width: 240px;
+    border: none !important;
+    outline:none;
+    padding:0px !important;
+    vertical-align:middle;
+}
+
+.imgLocate
+{
+    position: absolute;
+    cursor: pointer;
+    right: 0px;
+}
+
+.divAddressList
+{
+    margin-top: 5px;
+    color: #fff;
+    z-index: 101;
+    background-color: transparent;
+    border: none;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    behavior: url("styles/PIE.htc");
+}
+
+.bottomborder
+{
+    border-bottom: 1px solid white;
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/*Basemap Container Styles*/
+
+.basemapThumbnail
+{
+    -moz-box-shadow: 0 0 7px #000000;
+    -webkit-box-shadow: 0 0 7px #000000;
+    box-shadow: 0 0 7px #000000;
+    behavior: url("styles/PIE.htc");
+    border: 1px solid #fff;
+    height: 67px;
+    margin: 1px;
+    width: 102px;
+    cursor: pointer;
+}
+
+.baseMapContainerNode
+{
+    float: left;
+    margin: 10px 10px 10px 10px;
+    width: 100px;
+}
+
+.basemapLabel
+{
+    background-color: transparent;
+    color: #fff;
+    text-align: center;
+    width: 100%;
+    overflow: hidden;
+    display: block;
+}
+
+.divLayerContentHolder
+{
+    overflow: auto;
+    padding:7px;
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/*InfoWindow Styles*/
+
+.divInfoContainer
+{
+    top: 0px;
+    left: 0px;
+     background: rgba(0,0,0,0.9);
+    -pie-background: rgba(0,0,0,0.9);
+    position: absolute;
+    z-index: 1001;
+    width: 100%;
+    height: 100%;
+    behavior: url("styles/PIE.htc");
+}
+
+.divDetails
+{
+    position: relative;
+    display: none;
+}
+
+.divCommentsContainer, .divInfoDetails,.divInfoDirections
+{
+    overflow: hidden;
+    position: relative;
+}
+
+.divCommentsContent,.divInfoDetailsScroll,.divInfoDirectionsScroll
+{
+    overflow: hidden;
+    width: 95%;
+    color:White;
+}
+
+.tdInfoHeader
+{
+    font-weight: bolder;
+}
+
+.divInfoDetails, .divInfoComments,.divInfoDirections
+{
+    margin-left: 5px !important;
+}
+
+.divInfoWindowContainer
+{
+    z-index: 1002;
+    position: absolute;
+    background-color:#585858;
+    color: #fff;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.divTriangle
+{
+    border: solid 20px transparent;
+    border-top-color:#585858;
+    border-bottom: 0;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    display: block;
+    position: relative;
+    margin: auto;
+    bottom: 0px;
+}
+
+.spanContentText
+{
+    margin-left:5px;
+    margin-top:5px;
+}
+
+.title
+{
+   font-weight:bolder;
+}
+
+.dj_ie .divInfoWindowContainer
+{
+    border: none;
+}
+
+.divInfoWindowContainer .container
+{
+    position: absolute !important;
+    top: 0;
+    left: 0;
+}
+
+.imgInfoWindow
+{
+    position: relative;
+}
+
+.divInfoWindowContainer .content
+{
+    position: relative;
+    color: #fff;
+    overflow: auto;
+}
+
+.divInfoWindowContainer .title
+{
+    font-weight: bolder;
+    height: 21px;
+    padding: 7px 2px 2px 7px !important;
+    color: #fff;
+    background-color: #303030;
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    -moz-border-radius-bottomleft: 0px;
+    -moz-border-radius-bottomright: 0px;
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 0px;
+    -webkit-border-bottom-right-radius: 0px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-bottom:gray 1px solid;
+    behavior: url("styles/PIE.htc");
+}
+
+.imgArrow
+{
+    z-index: 1000;
+    position: absolute;
+    cursor: pointer;
+    right: 5px;
+    top: 7px;
+    height: 44px;
+    width: 44px;
+}
+
+.txtArea
+{
+    border: 1px solid #242424;
+    padding: 1px;
+    background-color: #333333;
+    color: #fff;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    resize: none;
+    height: 100px;
+    overflow:auto;
+}
+
+.tdBreakWord
+{
+    display:inline-block;
+    word-break:break-all;
+    word-wrap: break-word;
+}
+
+.tdBreak
+{
+    word-wrap: break-word;
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/*styles for headers */
+
+.spanHeader
+{
+    font-weight: bold;
+    margin-left: 2px;
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/* Styles for custom scrollbar*/
+
+.scrollbar_track
+{
+    position: absolute;
+    right: 0;
+    top: 2px;
+    background-color: transparent;
+    cursor: default;
+    display: block;
+}
+
+.scrollbar_handle
+{
+    position: relative;
+    width: 10px;
+    background-color: #C0C0C0;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius:5px;
+    opacity: 0.9;
+    -moz-opacity: 0.9;
+    cursor: default;
+    behavior: url("styles/PIE.htc");
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/* bottom panel css*/
+
+.divGradient
+{
+    height: 0px;
+    width: 100%;
+    bottom: 0px;
+    position: absolute;
+    z-index: 1005;
+    text-align: middle;
+}
+
+.divPollingDetails
+{
+    bottom: 0px;
+    height: 0px;
+    width: 100%;
+    position: absolute;
+    z-index: 1005;
+    text-align: middle;
+}
+
+.divSegmentContainer
+{
+    overflow: hidden;
+    height: 85px;
+    vertical-align: top;
+}
+
+.divDefaultHeader
+{
+    -moz-border-top-left-radius: 10px 10px;
+    -webkit-border-top-left-radius: 10px 10px;
+    border-top-left-radius: 10px 10px;
+    -moz-border-top-right-radius: 10px 10px;
+    -webkit-border-top-right-radius: 10px 10px;
+    border-top-right-radius: 10px 10px;
+    overflow:hidden;
+    font-weight: bolder;
+    cursor: pointer;
+    height: 36px;
+    width: 160px;
+    z-index: 1005;
+    text-align: center;
+   background-color: #81A286;
+   behavior: url("styles/PIE.htc");
+}
+
+.divSelectedHeader
+{
+    -moz-border-top-left-radius: 10px 10px;
+    -webkit-border-top-left-radius: 10px 10px;
+    border-top-left-radius: 10px 10px;
+     -moz-border-top-right-radius: 10px 10px;
+    -webkit-border-top-right-radius: 10px 10px;
+    border-top-right-radius: 10px 10px;
+    overflow:hidden;
+    font-weight: bolder;
+    cursor: default;
+    height: 36px;
+    width: 160px;
+    text-align: center;
+    z-index: 1005;
+    background-color: rgb(56,164,69);
+    behavior: url("styles/PIE.htc");
+}
+
+.divShowHeader
+{
+    -moz-border-top-left-radius: 10px 10px;
+    -webkit-border-top-left-radius: 10px 10px;
+    border-top-left-radius: 10px 10px;
+
+    -moz-border-top-right-radius: 10px 10px;
+    -webkit-border-top-right-radius: 10px 10px;
+    border-top-right-radius: 10px 10px;
+    overflow:hidden;
+
+    height: 36px;
+    width: 40px;
+    z-index: 1005;
+    text-align: center;
+    background-color: rgb(56,164,69);
+    behavior: url("styles/PIE.htc");
+}
+
+.divDetailsHeader
+{
+    height: 30px;
+    position: relative;
+   -moz-border-radius-topleft:  10px;
+   -webkit-border-top-left-radius: 10px;
+   -moz-border-radius-topright:  10px;
+   -webkit-border-top-right-radius: 10px;
+    border-radius: 10px 10px 0px 0px;
+   behavior: url("styles/PIE.htc");
+}
+
+.divContentStyle
+{
+    background-color: #626262;
+    height: 150px;
+    position: relative;
+    width: 100%;
+    -moz-border-radius-bottomleft:  10px;
+    -webkit-border-bottom-left-radius: 10px;
+    -moz-border-radius-bottomright:  10px;
+    -webkit-border-bottom-right-radius: 10px;
+    border-radius: 0px 0px 10px 10px;
+    behavior: url("styles/PIE.htc");
+}
+
+.style
+{
+    -moz-border-radius-bottomleft:  10px;
+    -webkit-border-bottom-left-radius: 10px;
+    -moz-border-radius-bottomright:  10px;
+    -webkit-border-bottom-right-radius: 10px;
+    border-radius: 0px 0px 10px 10px;
+    behavior: url("styles/PIE.htc");
+}
+
+.carouselscroll
+{
+    float: left;
+    height: 100%;
+    position: absolute;
+    left: 0px;
+    vertical-align: middle;
+}
+
+.carouselOfficescroll
+{
+   float : left;
+    height: 100%;
+    position: absolute;
+    left: 0px;
+    vertical-align: middle;
+}
+
+.divPollingData
+{
+    height: 200px;
+    width: 100%;
+    background-color: transparent;
+    position: relative;
+    overflow: hidden;
+    float: left;
+}
+
+.divOfficeData
+{
+    height: 200px;
+    width: 100%;
+    background-color: transparent;
+    position: relative;
+    overflow: hidden;
+    float: left;
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/*Styles for Loading indicator container*/
+
+.divLoadingIndicator
+{
+    height: 100%;
+    width: 100%;
+    display: none;
+    font-family: Verdana;
+    z-index: 2000;
+    position: absolute;
+    bottom: 0px;
+    filter: alpha(opacity = 55);
+    -moz-opacity: 0.55;
+    -khtml-opacity: 0.55;
+    opacity: 0.55;
+    top: 0px;
+    left: 0px;
+     background: rgba(0,0,0,0.65);
+    -pie-background: rgba(0,0,0,0.65);
+    behavior: url("styles/PIE.htc");
+}
+
+.imgSearchLoader
+{
+    vertical-align: middle;
+    display: none;
+    cursor: default;
+}

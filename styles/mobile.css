@@ -1,0 +1,204 @@
+﻿/*
+ |
+ |ArcGIS for Canadian Municipalities / ArcGIS pour les municipalités canadiennes
+ |Polling Place Locator v10.2.0 / Localisateur de bureau de scrutin v10.2.0
+ |This file was modified by Esri Canada - Copyright 2013 Esri Canada
+ |
+ | Version 10.2
+ | Copyright 2012 Esri
+ |
+ | Licensed under the Apache License, Version 2.0 (the "License");
+ | you may not use this file except in compliance with the License.
+ | You may obtain a copy of the License at
+ |
+ |    http://www.apache.org/licenses/LICENSE-2.0
+ |
+ | Unless required by applicable law or agreed to in writing, software
+ | distributed under the License is distributed on an "AS IS" BASIS,
+ | WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ | See the License for the specific language governing permissions and
+ | limitations under the License.
+ */
+/* This file contains the mobile specific style settings for "Election Polling Place" template */
+/* The common settings for the styles are defined in "electionPollingPlace.css" */
+/* Use this file to perform the following: */
+/* 1.  Set the body styles                      - { Style(s) to look for: html, body } */
+/* 2.  Set styles for icons, buttons and header styles
+                                                - { Style(s) to look for: customButton,tableHeader,tdHeader,imgOptions,imgShare}*/
+/* 3.  Set the styles for search container      - { Style(s) to look for: divAddressContainer,divAddressContent,txtAddress,imgLocate}*/
+/* 4.  Set the styles for info window           - { Style(s) to look for: divInfoWindowContainer .content,divInfoWindowContainer .title,infoOptions,spanContentText}*/
+/* 5.  Set the styles for esri slider           - { Style(s) to look for: esriSimpleSlider}*/
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+/* Styles for body*/
+
+html, body
+{
+    font-size: 15px !important;
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/*styles for icons, buttons and header styles*/
+.tableHeader
+{
+    width: 200px;
+}
+
+.tdHeader
+{
+    width: 70px;
+    font-weight: bolder;
+    padding:0px 10px 0px 10px;
+}
+
+.imgOptions,.imgShare
+{
+    height: 36px !important; /*CanMod*/
+    width: 36px !important; /*CanMod*/
+    vertical-align: middle;
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/*Styles for address container*/
+
+.divAddressContainer
+{
+    top: 0px;
+    left: 0px;
+    background: rgba(0,0,0,0.9);
+    position: absolute;
+    z-index: 1008;
+    width: 100%;
+    height: 100%;
+}
+.divAddressHolder
+{
+   z-index: 1008;
+   width: 100%;
+   height: 100%;
+     background-color: rgba(98, 98, 98,.95);
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+    -webkit-box-shadow: 0 0 10px #fff;
+    -moz-box-shadow: 0 0 10px #fff;
+    -o-box-shadow: 0 0 10px #fff;
+    box-shadow: 0 0 10px #fff;
+}
+
+.imgLocate
+{
+    height: 44px !important;
+    width: 44px !important;
+}
+
+.bottomborder
+{
+    height :40px;
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/*Styles for Info window container*/
+.divInfoWindowContainer
+{
+    z-index: 1004;
+}
+
+.divInfoContent
+{
+    background-color: rgba(98, 98, 98,.95);
+    width: 100%;
+    height: 100%;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+    z-index: 1006;
+    -webkit-box-shadow: 0 0 10px #fff;
+    -moz-box-shadow: 0 0 10px #fff;
+    -o-box-shadow: 0 0 10px #fff;
+    box-shadow: 0 0 10px #fff;
+}
+
+.divInfoContainer
+{
+    z-index: 1006;
+}
+.infoOptions
+{
+    height: 44px !important;
+    width: 44px !important;
+    vertical-align: middle;
+    padding:2px 3px 2px 2px;
+}
+.txtArea
+{
+    font-size:15px !important;
+    font-family: Verdana !important;
+}
+/*---------------------------------------------------------------------------------------------------------*/
+/*Styles for share application container*/
+
+.divAppContainer
+{
+   z-index: 1006;
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/* esri slider style*/
+.esriSimpleSlider
+{
+   left: 5px !important;
+   top: 60px !important;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+/*Styles for text area control*/
+
+/* Portrait */
+
+@media screen and (max-width: 320px)
+{
+
+    .txtArea
+    {
+        width:270px !important;
+        height:130px !important;
+    }
+     .txtAddress
+    {
+      height: 44px !important;
+      font-size: 15px !important;
+      font-family: Verdana !important;
+      width: 85% !important;
+      padding: 0px !important;
+    }
+    .divCommentsContent,.divInfoDetailsScroll,.divInfoDirectionsScroll
+    {
+      width: 95% !important;
+   }
+
+}
+
+/* Landscape */
+
+@media screen and (min-width: 321px) and (max-width: 580px)
+{
+
+   .txtArea
+    {
+        width:420px !important;
+        height:85px !important;
+    }
+    .txtAddress
+    {
+      height: 44px !important;
+      font-size: 15px !important;
+      font-family: Verdana !important;
+      width: 90% !important;
+      padding: 0px !important;
+    }
+    .divCommentsContent,.divInfoDetailsScroll,.divInfoDirectionsScroll
+    {
+      width: 97% !important;
+   }
+}
