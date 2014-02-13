@@ -27,7 +27,7 @@ dojo.declare("js.Config", null, {
     //
     // Use this file to perform the following:
     //
-    // 1.  Specify application title                  - [ Tag(s) to look for: ApplicationName ]
+    // 1.  Specify application title & icon           - [ Tag(s) to look for: ApplicationName, WindowTitle, ApplicationIcon ]
     // 2.  Set splash screen message                  - [ Tag(s) to look for: SplashScreenMessage ]
     // 3.  Set URL for help page                      - [ Tag(s) to look for: HelpURL ]
     // 4.  Set localization terms                     - [ Tag(s) to look for: PollingPlaceLabel, CandidatesTabLabel ]
@@ -49,21 +49,23 @@ dojo.declare("js.Config", null, {
     // 9.  Customize address search settings          - [ Tag(s) to look for: LocatorSettings ]
     //
     // 10. Set URL for geometry & printing service    - [ Tag(s) to look for: GeometryService, PrintingService ]
+	//
+	// 11. Setup the language toggle button           - [ Tag(s) to look for: LanguageButton ]
     //
-    // 11. Customize routing settings for directions  - [ Tag(s) to look for: RouteServiceURL, ArcGISOnlineClientID DirectionsLanguage, RouteColor, RouteWidth ]
-    // 11a.Choose destination for route generation    - [ Tag(s) to look for: GenerateRouteToNonDesignatedPollingPlace <true/false> ]
-    // 11b.Choose the unit for route directions       - [ Tag(s) to look for: UnitConfig ]
+    // 12. Customize routing settings for directions  - [ Tag(s) to look for: RouteServiceURL, ArcGISOnlineClientID DirectionsLanguage, RouteColor, RouteWidth ]
+    // 12a.Choose destination for route generation    - [ Tag(s) to look for: GenerateRouteToNonDesignatedPollingPlace <true/false> ]
+    // 12b.Choose the unit for route directions       - [ Tag(s) to look for: UnitConfig ]
     //
-    // 12. Configure data to be displayed on the bottom panel
+    // 13. Configure data to be displayed on the bottom panel
     //                                                - [ Tag(s) to look for: InfoBoxWidth, PollingPlaceTabData, CandidatesTabData ]
     //
-    // 13. Define Database fields                     - [ Tag(s) to look for: DatabaseFields, CommentsInfoPopupFieldsCollection ]
+    // 14. Define Database fields                     - [ Tag(s) to look for: DatabaseFields, CommentsInfoPopupFieldsCollection ]
     //
-    // 14. Specify URLs for map sharing               - [ Tag(s) to look for: FacebookShareURL, TwitterShareURL, ShareByMailLink ]
-    // 14a.In case of changing the TinyURL service
+    // 15. Specify URLs for map sharing               - [ Tag(s) to look for: FacebookShareURL, TwitterShareURL, ShareByMailLink ]
+    // 15a.In case of changing the TinyURL service
     //     Specify URL for the new service            - [ Tag(s) to look for: MapSharingOptions (set TinyURLServiceURL, TinyURLResponseAttribute) ]
-    // 14b.Specify the share settings                 - [ Tag(s) to look for: TwitterStatus, TwitterHashtag, TwitterFollow, EmailSubject ]
-    // 14c.Specify the Facebook/Twitter URL in case of change to URL
+    // 15b.Specify the share settings                 - [ Tag(s) to look for: TwitterStatus, TwitterHashtag, TwitterFollow, EmailSubject ]
+    // 15c.Specify the Facebook/Twitter URL in case of change to URL
     //                                                - [ Tag(s) to look for: FacebookShareURL, TwitterShareURL ]
 
     // ------------------------------------------------------------------------------------------------------------------------
@@ -71,10 +73,13 @@ dojo.declare("js.Config", null, {
     // ------------------------------------------------------------------------------------------------------------------------
     // Set application title
     ApplicationName: "Polling Place Locator",
-    WindowTitle: "Polling Places", //CanMod
+    WindowTitle: "Polling Places",
+	
+	// Set application icon path
+	ApplicationIcon: "images/appIcon.png",
 
     // Set splash window content - Message that appears when the application starts
-    SplashScreenMessage: "<b>Polling Place Locator</b> <br/> <hr/> <br/> The <b>Polling Place Locator</b> helps voters locate their assigned election polling place (regular or advanced poll), get driving directions, get poll location information, comment on the polling place conditions, and obtain candidate information. A voter can enter an address in the Search Address Box, select a point on the map or use the geolocator. The voter can switch between regular (default) and advanced polling places.<br/><br/>",
+    SplashScreenMessage: "<strong>Polling Place Locator</strong> <br/> <hr/> <br/> The <strong>Polling Place Locator</strong> helps voters locate their assigned election polling place (regular or advanced poll), get driving directions, get poll location information, comment on the polling place conditions, and obtain candidate information. A voter can enter an address in the Search Address Box, select a point on the map or use the geolocator. The voter can switch between regular (default) and advanced polling places.<br/><br/>",
 
     // Set URL of help page/portal
     HelpURL: "help.htm",
@@ -245,20 +250,20 @@ dojo.declare("js.Config", null, {
 
     // Set Locator service settings
     LocatorSettings: {
-		ShowSearchOnStartup: false,
+		DisplayText: "Search for an address",
+		Example: "Try searching for a street address such as '12 Concorde Place'",
 		MyLocationLabel: "my location",
-		DefaultLocatorSymbol: "images/RedPushpin.png",
-		SymbolSize: { width: 25, height: 25 },
-		DefaultValue: "Enter Address",
-		LocatorParameters: ["SingleLine"],
 		LocatorFields: ["Address", "City", "Region", "Postal"],
+		DefaultLocatorSymbol: "images/RedPushpin.png",
+		DefaultResultSymbol: "images/ripple.png",
+		SymbolSize: { width: 25, height: 25 },
 		LocatorURL: "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer",
+		LocatorParamaters: ["SingleLine"],
 		CandidateFields: "Loc_name, Score, Match_addr",
-		FieldName: "${Match_addr}",
+		DisplayFieldCML2: "Match_addr",
+		AddressMatchScore: 80,
 		LocatorFieldName: 'Loc_name',
 		LocatorFieldValues: ["CAN.StreetName" , "CAN.PointAddress", "CAN.StreetAddress", "CAN.PostalExt"],
-		AddressMatchScore: 80,
-		LocatorRipple: { image:"images/ripple.png", width: 30, height: 30 },
 		//CanMod: Set the extent to be used when searching for an address, set wkid to 0000 in order to search whole of North America
 		//CGS_WGS_1984: Use wkid 4326 and decimal degrees; WGS_1984_Web_Mercator: Use wkid 3785 and metres; Other systems not supported
 		SearchExtent: {xmin: -8865402.789852107, ymin: 5443102.360231639, xmax: -8807068.937666388, ymax: 5400828.978730424, wkid: 3785}
@@ -272,6 +277,17 @@ dojo.declare("js.Config", null, {
 	
 	// Set Export Web Map Task URL (Part of 10.1/10.2 Printing Tools) - Leave blank to disable map printing
 	PrintingService: "http://yourserver:6080/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",
+	
+	// ------------------------------------------------------------------------------------------------------------------------
+	// LANGUAGE TOGGLE BUTTON
+	// ------------------------------------------------------------------------------------------------------------------------
+	// Allows you to include a toggle button in the toolbar to switch between two version of the application
+	LanguageButton: {
+		Enabled: false,
+		Image: "images/language_FR.png",
+		Title: "Switch to French Application",
+		AppURL: "http://yourwebsite..."
+	},
 
     // ------------------------------------------------------------------------------------------------------------------------
     // DRIVING DIRECTIONS SETTINGS
@@ -315,14 +331,14 @@ dojo.declare("js.Config", null, {
           {
               DirectionBox: //Must not be removed
                     {
-                        HeaderColor: "#303030",
-                        Title: "<b>Driving Directions</b>",
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Driving Directions</strong>",
                         ShowDirection: true
                     },
               DetailsBox:
                     {
-                        HeaderColor: "#303030",
-                        Title: "<b>Details</b>",
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Details</strong>",
 						//AttachmentDisplayField: "Ballot", //Optional
                         Data:
                               [
@@ -358,8 +374,8 @@ dojo.declare("js.Config", null, {
                     },
               ContactBox:
                     {
-                        HeaderColor: "#303030",
-                        Title: "<b>Contact</b>",
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Contact</strong>",
                         Data:
                               [
                                         {
@@ -378,8 +394,8 @@ dojo.declare("js.Config", null, {
                     },
               CommentsBox: //Must not be removed
                     {
-                        HeaderColor: "#303030",
-                        Title: "<b>Comments</b>"
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Comments</strong>"
                     }
           },
 
@@ -389,8 +405,8 @@ dojo.declare("js.Config", null, {
               Mayor:
                     {
                         ServiceUrl: "http://yourserver:6080/arcgis/rest/services/Divisions/MapServer/1",
-                        HeaderColor: "#303030",
-                        Title: "<b>City of Toronto Mayor</b>",
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>City of Toronto Mayor</strong>",
                         Data:
                               [
                                         {
@@ -554,8 +570,8 @@ dojo.declare("js.Config", null, {
               Councillor:
                     {
                         ServiceUrl: "http://yourserver:6080/arcgis/rest/services/Divisions/MapServer/2",
-                        HeaderColor: "#303030",
-                        Title: "<b>Ward Councillor</b>",
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Ward Councillor</strong>",
                         Data:
                               [
                                         {
@@ -623,8 +639,8 @@ dojo.declare("js.Config", null, {
               TDSB:
                     {
                         ServiceUrl: "http://yourserver:6080/arcgis/rest/services/Divisions/MapServer/3",
-                        HeaderColor: "#303030",
-                        Title: "<b>Toronto District School Board Trustee</b>",
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Toronto District School Board Trustee</strong>",
                         Data:
                               [
                                         {
@@ -664,8 +680,8 @@ dojo.declare("js.Config", null, {
               TCDSB:
                     {
                         ServiceUrl: "http://yourserver:6080/arcgis/rest/services/Divisions/MapServer/4",
-                        HeaderColor: "#303030",
-                        Title: "<b>Toronto Catholic District School Board Trustee</b>",
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Toronto Catholic District School Board Trustee</strong>",
                         Data:
                               [
                                         {
@@ -709,8 +725,8 @@ dojo.declare("js.Config", null, {
               CSDCSO:
                     {
                         ServiceUrl: "http://yourserver:6080/arcgis/rest/services/Divisions/MapServer/5",
-                        HeaderColor: "#303030",
-                        Title: "<b>Conseil scolaire de district du Centre-Sud-Ouest</b>",
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Conseil scolaire de district du Centre-Sud-Ouest</strong>",
                         Data:
                               [
                                         {
@@ -734,8 +750,8 @@ dojo.declare("js.Config", null, {
               CSDCCS:
                     {
                         ServiceUrl: "http://yourserver:6080/arcgis/rest/services/Divisions/MapServer/6",
-                        HeaderColor: "#303030",
-                        Title: "<b>Conseil scolaire de district Catholique du Centre-Sud</b>",
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Conseil scolaire de district Catholique du Centre-Sud</strong>",
                         Data:
                               [
                                         {
@@ -795,7 +811,7 @@ dojo.declare("js.Config", null, {
     //-------------------------------------------------------------------------------------------------------------------------
     // WEBMAPS ARE NOT SUPPORTED AT 10.2, SEE DETAILS BELOW
     //-------------------------------------------------------------------------------------------------------------------------
-    // WebMaps are not supported with the 10.2 version of the Polling Place Locator application. Please use Map Services for operational layers. Do not change the "UseWebmap" and "WebMapId" parameters.
+    // WebMaps are not supported with the 10.2 version of the Polling Place Locator application. Please use Feature Services for operational layers. Do not change the "UseWebmap" and "WebMapId" parameters.
     UseWebmap: false,
     WebMapId: ""
 });

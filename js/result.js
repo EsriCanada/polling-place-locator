@@ -31,7 +31,7 @@ function ShowHideResult(imgToggle) {
                     }
                 }
                 dojo.byId('imgToggleResults').src = "images/down.png";
-                dojo.byId('imgToggleResults').title = HidePanelTooltip; //CanMod
+                dojo.byId('imgToggleResults').title = intl.HidePanelTooltip; //CanMod
 				dojo.byId('imgPrint').title = PrintTooltip; //CanMod: Print button behavior
                 // maximize
             }
@@ -40,7 +40,7 @@ function ShowHideResult(imgToggle) {
                 WipeOutResults();
                 dojo.byId('imgToggleResults').src = "images/up.png";
                 if (dojo.byId('divPollingPlaceDetailsHeader').className || dojo.byId('divElectedOfficialsHeader').className == "divSelectedHeader") {
-                    dojo.byId('imgToggleResults').title = ShowPanelTooltip; //CanMod
+                    dojo.byId('imgToggleResults').title = intl.ShowPanelTooltip; //CanMod
 					dojo.byId('imgPrint').title = PrintTooltip; //CanMod: Print button behavior
                 }
                 //minimize
@@ -142,9 +142,7 @@ function ShowElectedOffialInfo(attributes, electedOfficialsTabData, index, field
 
 //function for map click event
 function FindLocation(evt) {
-	StopFlashSearchButton(); //CanMod
 	showCandidates = true; //CanMod: When click on map, show candidates (clicking outside area is handled by other functions)
-    HideAddressContainer();
     noRoute = false;
     ShowProgressIndicator();
     if (!isMobileDevice) {
@@ -325,6 +323,7 @@ function GetDesignatedPollingPlace(features, precinctAttrs) {
 
             devObjectId = features[0].attributes[map.getLayer(pollLayerId).objectIdField];
             map.getLayer(pollLayerId).queryAttachmentInfos(devObjectId, GetAttachmentInfo, function (err) {
+				console.info("Expected error handled in code");
                 GetAttachmentInfo();
             });
 
@@ -348,7 +347,7 @@ function GetDesignatedPollingPlace(features, precinctAttrs) {
             else {
                 ShowPollingPlace(null, amendedAttrs);
             }
-			var symbol = new esri.symbol.PictureMarkerSymbol(locatorSettings.LocatorRipple.image, locatorSettings.LocatorRipple.width, locatorSettings.LocatorRipple.height); //CanMod: Switch from Marker Symbol with transparencies to a Picture Marker (transparencies not compatible with print)
+			var symbol = new esri.symbol.PictureMarkerSymbol(locatorSettings.DefaultResultSymbol, locatorSettings.SymbolSize.width, locatorSettings.SymbolSize.height); //CanMod: Switch from Marker Symbol with transparencies to a Picture Marker (transparencies not compatible with print)
             AddGraphic(map.getLayer(highlightPollLayerId), symbol, pollPoint);
             if (isMobileDevice) {
                 ShowServiceInfoDetails(pollPoint, amendedAttrs); //CanMod: Include Precinct info for popup in utlis.js Ln1400
@@ -377,7 +376,7 @@ function GetDesignatedPollingPlace(features, precinctAttrs) {
                     }
                 }, 500);
                 dojo.byId('imgToggleResults').src = "images/down.png";
-                dojo.byId('imgToggleResults').title = HidePanelTooltip; //CanMod
+                dojo.byId('imgToggleResults').title = intl.HidePanelTooltip; //CanMod
 				dojo.byId('imgPrint').title = PrintTooltip; //CanMod: Print button behavior
                 // maximize
             }

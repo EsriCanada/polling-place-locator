@@ -27,14 +27,16 @@ dojo.require("esri.tasks.query");
 dojo.require("esri.tasks.locator");
 dojo.require("esri.tasks.route");
 dojo.require("dojo.date.locale");
-dojo.require("dojox.mobile.parser");
-dojo.require("dojox.mobile");
 dojo.require("js.Config");
 dojo.require("dojo.window");
 dojo.require("js.date");
 dojo.require("esri.geometry.Extent"); //CanMod: Set extent of address search
 dojo.require("esri.SpatialReference"); //CanMod: Set extent of address search
 dojo.require("esri.IdentityManager"); //CanMod: Use of subscription routing
+
+//CanMod: Load internationalization object
+var intl;
+require(["dojo/i18n!js/nls/text"],function(i18n) {intl = i18n;});
 
 var baseMapLayers;  //Variable for storing base map layers
 var infoBoxWidth; //variable for storing the width of the box
@@ -90,7 +92,6 @@ var tempGraphicsLayerId = 'tempGraphicsLayerID';  //variable to store graphics l
 var mapSharingOptions; //variable to store the tiny service URL
 var useWebmap; //flag used for setting the webmap use.
 var referenceOverlayLayer; //variable to store the reference overlayLayer service URL
-var locatorSettings; //variable to store the locator settings
 var commentsInfoPopupFieldsCollection; //variable to store the info popup fields for comments
 var databaseFields; // Define the database field names
 var precinctID; //variable to store the field Id for precinct
@@ -111,93 +112,49 @@ var directionsLanguage; //CanMod: Variable to store Driving Direction Language
 var mapImgURL = ""; //CanMod: Store the printout map image URL
 var printService; //CanMod: Store the URL to the map export service
 
+var locatorSettings; //variable used to store address search setting
+var lastSearchTime; //variable for store the time of last search
+var lastSearchString; //variable for store the last search string
+var lastSearchResults; //variable to store the last search candidates
+var timeouts = {}; //object to store timeout objects
+
 //This initialization function is called when the DOM elements are ready
 function init() {
 	require(["dojo/dnd/Moveable"],function(Moveable) {new Moveable(dojo.byId("printWindow"));}); //CanMod:Make the print dialog div moveable
-	Internationalization(false); //CanMod: Launch the internationalization function in internationalization.js (variable creation only)
 	
     esri.config.defaults.io.proxyUrl = "proxy.ashx";        //Setting to use proxy file
     esriConfig.defaults.io.alwaysUseProxy = false;
     esriConfig.defaults.io.timeout = 180000;    //esri request timeout value
 
-    var userAgent = window.navigator.userAgent;
-
-    if (userAgent.indexOf("iPhone") >= 0 || userAgent.indexOf("iPad") >= 0) {
-        isiOS = true;
-    }
-    if ((userAgent.indexOf("Android") >= 0 && userAgent.indexOf("Mobile") >= 0) || userAgent.indexOf("iPhone") >= 0) {
-        fontSize = 15;
-        isMobileDevice = true;
-        dojo.byId('dynamicStyleSheet').href = "styles/mobile.css";
-    }
-    else if ((userAgent.indexOf("iPad") >= 0) || (userAgent.indexOf("Android") >= 0)) {
+	//As of 2013, detects: Mobile: iOS/iPhone, Android Mobile, Blackberry Phone, Windows Phone, Symbian OS, Firefox OS, Opera Mini/Mobile
+	//                     Tablet: iOS/iPad, Android Tablet, Blackberry Playbook, Windows RT (Microsoft Surface RT, Asus VivoTab RT, Dell XPS, Lumia Tablets...)
+	//                     Browser: All others including Windows 7/8 tablets
+    var userAgent = window.navigator.userAgent.toLowerCase(); //used to detect the type of devices
+	if (userAgent.indexOf("ipad") >= 0) {
+		isiOS = true;
         fontSize = 14;
         isTablet = true;
         dojo.byId('dynamicStyleSheet').href = "styles/tablet.css";
-    }
-    else {
+    } else if (userAgent.indexOf("iphone") >= 0) {
+        isiOS = true;
+        fontSize = 15;
+        isMobileDevice = true;
+        dojo.byId('dynamicStyleSheet').href = "styles/mobile.css";
+    } else if (userAgent.indexOf("mobile") >= 0 || userAgent.indexOf("opera mini") >= 0 || userAgent.indexOf("opera mobi") >= 0 || userAgent.indexOf("symbian") >= 0) {
+        fontSize = 15;
+        isMobileDevice = true;
+        dojo.byId('dynamicStyleSheet').href = "styles/mobile.css";
+    } else if (userAgent.indexOf("tablet") >= 0 || /*Android not mobile*/ userAgent.indexOf("android") >= 0 || (/*Windows RT*/ userAgent.indexOf("windows") >= 0 && userAgent.indexOf("arm") >= 0)) {
+        fontSize = 14;
+        isTablet = true;
+        dojo.byId('dynamicStyleSheet').href = "styles/tablet.css";
+    } else {
         fontSize = 11;
         isBrowser = true;
         dojo.byId('dynamicStyleSheet').href = "styles/browser.css";
     }
+	
     dojo.byId("divSplashContent").style.fontSize = fontSize + "px";
-
-    // Identify the key presses while implementing auto-complete and assign appropriate actions
-    dojo.connect(dojo.byId("txtAddress"), 'onkeyup', function (evt) {
-        if (evt) {
-            if (evt.keyCode == dojo.keys.ENTER) {
-                if (dojo.byId("txtAddress").value != '') {
-                    dojo.byId("imgSearchLoader").style.display = "block";
-                    LocateAddress();
-                    return;
-                }
-            }
-            if ((!((evt.keyCode >= 46 && evt.keyCode < 58) || (evt.keyCode > 64 && evt.keyCode < 91) || (evt.keyCode > 95 && evt.keyCode < 106) || evt.keyCode == 8 || evt.keyCode == 110 || evt.keyCode == 188)) || (evt.keyCode == 86 && evt.ctrlKey) || (evt.keyCode == 88 && evt.ctrlKey)) {
-                evt = (evt) ? evt : event;
-                evt.cancelBubble = true;
-                if (evt.stopPropagation) evt.stopPropagation();
-                return;
-            }
-
-            if (dojo.coords("divAddressContent").h > 0) {
-                if (dojo.byId("txtAddress").value.trim() != '') {
-                    if (lastSearchString != dojo.byId("txtAddress").value.trim()) {
-                        lastSearchString = dojo.byId("txtAddress").value.trim();
-                        RemoveChildren(dojo.byId('tblAddressResults'));
-
-                        // Clear any staged search
-                        clearTimeout(stagedSearch);
-
-                        if (dojo.byId("txtAddress").value.trim().length > 0) {
-                            // Stage a new search, which will launch if no new searches show up
-                            // before the timeout
-                            stagedSearch = setTimeout(function () {
-                                dojo.byId("imgSearchLoader").style.display = "block";
-                                LocateAddress();
-                            }, 500);
-                        }
-                    }
-                } else {
-                    lastSearchString = dojo.byId("txtAddress").value.trim();
-                    dojo.byId("imgSearchLoader").style.display = "none";
-                    RemoveChildren(dojo.byId('tblAddressResults'));
-                    CreateScrollbar(dojo.byId("divAddressScrollContainer"), dojo.byId("divAddressScrollContent"));
-                }
-            }
-        }
-    });
-
-    dojo.connect(dojo.byId("txtAddress"), 'onpaste', function (evt) {
-        setTimeout(function () {
-            LocateAddress();
-        }, 100);
-    });
-
-    dojo.connect(dojo.byId("txtAddress"), 'oncut', function (evt) {
-        setTimeout(function () {
-            LocateAddress();
-        }, 100);
-    });
 
     window.onkeydown = function (e) {
         return !(e.keyCode == 9);
@@ -205,102 +162,57 @@ function init() {
 
     //Check whether browser supports geolocation or not using modernizr
     if (!Modernizr.geolocation) {
-        dojo.byId("tdGeolocation").style.display = "none";
+        dojo.byId("geolocateButton").style.display = "none";
     }
 
     // Read config.js file to set appropriate values
     var responseObject = new js.Config();
-    useWebmap = responseObject.UseWebmap;
-    if (useWebmap) {
-        webMapId = responseObject.WebMapId;
-        var count = 0;
-        var webmapDetails = getWebMapInfo("electionPollingPlace", webMapId);
-        webmapDetails.addCallback(function (webmapInfo) {
-            electedOfficialsTabData = [];
-            infoPopupFieldsCollection = [];
-            referenceOverlayLayer.ServiceUrl = webmapInfo.basemap.url;
-
-            for (var b = 0; b < webmapInfo.operationalLayers.length; b++) {
-                dojo.io.script.get({
-                    url: webmapInfo.operationalLayers[b].url + "?f=pjson",
-                    callbackParamName: "callback",
-                    load: function (data) {
-                        count++;
-                        for (var c = 0; c < webmapInfo.operationalLayers.length; c++) {
-                            if (this.url == webmapInfo.operationalLayers[c].url + "?f=pjson") {
-                                break;
-                            }
-                        }
-                        if (data.geometryType == "esriGeometryPolygon") {
-                            if (webmapInfo.operationalLayers[c].popupInfo) {
-                                if (!electedOfficialsTabData[webmapInfo.operationalLayers[c].id]) {
-                                    dataLayer = [];
-                                    for (var d = 0; d < webmapInfo.operationalLayers[c].popupInfo.fieldInfos.length; d++) {
-                                        if (webmapInfo.operationalLayers[c].popupInfo.fieldInfos[d].visible) {
-                                            dataLayer.push({ "DisplayText": webmapInfo.operationalLayers[c].popupInfo.fieldInfos[d].label + ":", "FieldName": "${" + webmapInfo.operationalLayers[c].popupInfo.fieldInfos[d].fieldName + "}" });
-                                        }
-                                    }
-                                    electedOfficialsTabData[webmapInfo.operationalLayers[c].id] = [];
-                                    electedOfficialsTabData[webmapInfo.operationalLayers[c].id] = ({ "ServiceUrl": webmapInfo.operationalLayers[c].url, "HeaderColor": "#393939", "Title": webmapInfo.operationalLayers[c].title.split("- ")[1], "Data": dataLayer });
-                                }
-                            }
-                            else {
-                                precinctLayer.ServiceUrl = webmapInfo.operationalLayers[c].url;
-                            }
-                        }
-                        else {
-                            if (!isMobileDevice) {
-                                pollLayer.ServiceUrl = webmapInfo.operationalLayers[c].url;
-                                if (webmapInfo.operationalLayers[c].popupInfo.title) {
-                                    infoTitle = webmapInfo.operationalLayers[c].popupInfo.title.split("{")[0];
-                                    infoWindowHeader = "$" + webmapInfo.operationalLayers[c].popupInfo.title.split(": ")[1];
-                                }
-                                if (webmapInfo.operationalLayers[c].popupInfo.fieldInfos.length > 0) {
-                                    for (var r = 0; r < webmapInfo.operationalLayers[c].popupInfo.fieldInfos.length; r++) {
-                                        if (webmapInfo.operationalLayers[c].popupInfo.fieldInfos[r].visible) {
-                                            infoWindowContent = "${" + webmapInfo.operationalLayers[c].popupInfo.fieldInfos[r].fieldName + "}";
-                                            break;
-                                        }
-                                    }
-                                }
-                                for (var e = 0; e < webmapInfo.operationalLayers[c].popupInfo.fieldInfos.length; e++) {
-                                    if (webmapInfo.operationalLayers[c].popupInfo.fieldInfos[e].visible) {
-                                        infoPopupFieldsCollection.push({ "DisplayText": webmapInfo.operationalLayers[c].popupInfo.fieldInfos[e].label + ":", "FieldName": "${" + webmapInfo.operationalLayers[c].popupInfo.fieldInfos[e].fieldName + "}" });
-                                    }
-                                }
-                            }
-                            else {
-                                pollMobileLayer.ServiceUrl = webmapInfo.operationalLayers[c].url;
-                                if (webmapInfo.operationalLayers[c].popupInfo.title) {
-                                    infoTitle = webmapInfo.operationalLayers[c].popupInfo.title.split("{")[0];
-                                    infoWindowHeader = "$" + webmapInfo.operationalLayers[c].popupInfo.title.split(": ")[1];
-                                }
-                                if (webmapInfo.operationalLayers[c].popupInfo.fieldInfos.length > 0) {
-                                    for (var r = 0; r < webmapInfo.operationalLayers[c].popupInfo.fieldInfos.length; r++) {
-                                        if (webmapInfo.operationalLayers[c].popupInfo.fieldInfos[r].visible) {
-                                            infoWindowContent = "${" + webmapInfo.operationalLayers[c].popupInfo.fieldInfos[r].fieldName + "}";
-                                            break;
-                                        }
-                                    }
-                                }
-                                for (var e = 0; e < webmapInfo.operationalLayers[c].popupInfo.fieldInfos.length; e++) {
-                                    if (webmapInfo.operationalLayers[c].popupInfo.fieldInfos[e].visible) {
-                                        infoPopupFieldsCollection.push({ "DisplayText": webmapInfo.operationalLayers[c].popupInfo.fieldInfos[e].label + ":", "FieldName": "${" + webmapInfo.operationalLayers[c].popupInfo.fieldInfos[e].fieldName + "}" });
-                                    }
-                                }
-                            }
-                        }
-                        if (count == webmapInfo.operationalLayers.length) {
-                            MapInitFunction();
-                        }
-                    },
-                    error: function (error) {
-                        alert(error.message);
-                    }
-                });
-            }
-        });
-    }
+	
+	//Display language toggle button if required
+	if (responseObject.LanguageButton.Enabled && !isMobileDevice) {
+		var langB = document.getElementById("imgLang");
+		langB.src = responseObject.LanguageButton.Image;
+		langB.alt = responseObject.LanguageButton.Title;
+		langB.title = responseObject.LanguageButton.Title;
+		
+		dojo.connect(langB, "onclick", function() {
+			window.location.href = responseObject.LanguageButton.AppURL;
+		});
+		dojo.connect(langB, "onkeydown", function (evt) {
+			var kc = evt.keyCode;
+			if (kc == dojo.keys.ENTER || kc == dojo.keys.SPACE) {
+				window.location.href = responseObject.LanguageButton.AppURL;
+			}
+		});
+		
+		langB.style.display = "inline";
+	}
+	
+	//Inline search module initialization
+	if (isMobileDevice) {
+		dojo.byId('searchButton').style.display = "inline";
+		dojo.replaceClass(dojo.byId("divAddressSearch"),"searchBlock","searchInline");
+		document.getElementById("searchTitle").innerHTML = responseObject.LocatorSettings.DisplayText;
+		document.getElementById("searchTitle").style.display = "block";
+	} else {
+		if (dojo.isIE <= 7 || isTablet) {
+			dojo.byId('searchButton').style.display = "inline";
+			dojo.replaceClass(dojo.byId("divAddressSearch"),"searchBlock","searchInline");
+			document.getElementById("searchTitle").innerHTML = responseObject.LocatorSettings.DisplayText;
+			document.getElementById("searchTitle").style.display = "block";
+		}
+		else {
+			if (dojo.isIE <=9) {
+				document.getElementById("searchInput").value = responseObject.LocatorSettings.DisplayText;
+				require(["dojo/on"],function(on) {
+					on.once(dojo.byId("searchInput"),"focus",function() {document.getElementById("searchInput").value = "";});
+				});
+			}
+			document.getElementById("searchInput").setAttribute("placeholder", responseObject.LocatorSettings.DisplayText);
+			dojo.byId('divAddressSearch').style.display = "inline-block";
+		}
+	}
+	
 	//CanMod: Login to AGOL Subscription for Routing Service
 	//Function called if token request suceeds, build object with token and gives to Identity Manager, continues map initialization
 	function tokenObtained(response) {
@@ -310,7 +222,7 @@ function init() {
 		params.userId = responseObject.ArcGISOnlineClientID;
 		esri.id.registerToken(params);
 		Initialize(responseObject);
-		Internationalization(true); //CanMod: Launch the internationalization function in internationalization.js along with the code block
+		Internationalization(); //CanMod: Launch the internationalization function in internationalization.js along with the code block
 	}
 	
 	//Function called if token request fails, disables routing and continue map initialization
@@ -325,7 +237,7 @@ function init() {
 	
 	//If a client ID is defined in config file, send request to proxy for a token
 	if (responseObject.ArcGISOnlineClientID != "") {
-		var curURL = 	responseObject.UrlToProxy;
+		var curURL = responseObject.UrlToProxy;
 		esri.request({
 			url: curURL + "?OAuth2&appID=" + responseObject.ArcGISOnlineClientID,
 			handleAs: "json",
@@ -352,41 +264,23 @@ function Initialize(responseObject) {
 
     if (isMobileDevice) {
         dojo.byId('divInfoContainer').style.display = "none";
-        dojo.replaceClass("divAddressHolder", "hideContainer", "hideContainerHeight");
-        dojo.byId('divAddressContainer').style.display = "none";
         dojo.removeClass(dojo.byId('divInfoContainer'), "opacityHideAnimation");
-        dojo.removeClass(dojo.byId('divAddressContainer'), "hideContainerHeight");
         dojo.byId('divSplashScreenContent').style.width = "95%";
         dojo.byId('divSplashScreenContent').style.height = "95%";
         dojo.byId('imgDirections').src = "images/imgDirections.png";
         dojo.byId('imgDirections').title = "Directions";
-        dojo.byId("divLogo").style.display = "none";
         dojo.byId("lblAppName").style.display = "none";
-        dojo.byId("lblAppName").style.width = "80%";
     }
     else {
-        var imgBasemap = document.createElement('img');
-        imgBasemap.src = "images/imgBaseMap.png";
-        imgBasemap.className = "imgOptions";
-        imgBasemap.title = "Switch Basemap";
-        imgBasemap.id = "imgBaseMap";
-        imgBasemap.style.cursor = "pointer";
-        imgBasemap.onclick = function () {
-            ShowBaseMaps();
-        }
-        dojo.byId("tdBaseMap").appendChild(imgBasemap);
-        dojo.byId("tdBaseMap").className = "tdHeader";
+        dojo.byId("basemapButton").style.display = "inline";
         dojo.byId('divSplashScreenContent').style.width = "350px";
         dojo.byId('divSplashScreenContent').style.height = "290px";
-        dojo.byId('divAddressContainer').style.display = "block";
         dojo.byId('imgDirections').src = "images/Details.png";
-        dojo.byId('imgDirections').title = DetailsTooltip; //CanMod
+        dojo.byId('imgDirections').title = intl.DetailsTooltip; //CanMod
         dojo.byId('imgDirections').style.display = "none";
-        dojo.byId("divLogo").style.display = "none"; //CanMod: Alway hide the logo
     }
 
-    //dojo.byId('imgApp').src = responseObject.ApplicationIcon;
-    dojo.byId("lblAppNameText").innerHTML = responseObject.ApplicationName;
+    dojo.byId("lblAppName").innerHTML = "<img alt='' src='" + responseObject.ApplicationIcon + "'>" + responseObject.ApplicationName;
     dojo.byId('divSplashContent').innerHTML = responseObject.SplashScreenMessage;
 
     dojo.xhrGet(
@@ -410,6 +304,7 @@ function Initialize(responseObject) {
     geometryService = new esri.tasks.GeometryService(responseObject.GeometryService);
 
 	pollLayer = responseObject.PollLayer;
+	pollMobileLayer = responseObject.PollMobileLayer;
     //CanMod: Code to display poll type switch button and replace the regular polls with advanced if required
 	//This is done according to the URL, if it contains the parameter "pollType=Alt" then advanced is loaded
 	advPolls = responseObject.AdvancedPolls;
@@ -427,28 +322,22 @@ function Initialize(responseObject) {
 	
 	//Add button/change to advanced polls if required
 	if (advPolls.Display && !isMobileDevice && !advExpired) {
-		var Td0 = dojo.byId("Td0");
-		Td0.style.cursor = "pointer";
-		Td0.style.backgroundImage = "url('images/switch_transparent.png')";
-		Td0.style.backgroundPosition = "center center";
-		Td0.style.backgroundRepeat = "no-repeat";
-		Td0.style.fontSize = "xx-small";
-		Td0.onclick = function () {
-			SwitchPollType();
-		}
+		var advButton = dojo.byId("advButton");
+		advButton.style.display = "inline-block";
+		if (dojo.isIE <= 7) {advButton.style.display = "inline";} //IE7 does not follow CSS standards
 		if (window.location.search.indexOf("pollType=Alt")>-1) {
-			pollLayer.ServiceUrl = responseObject.AdvancedPolls.ServiceURL
-			Td0.title = SwitchTooltip + advPolls.NameOfRegular;
-			Td0.innerHTML = SwitchTooltip + advPolls.NameOfRegular;
-			dojo.byId("lblAppNameText").innerHTML = responseObject.ApplicationName + " &bull; " + advPolls.NameOfAdvanced;
+			pollLayer.ServiceUrl = responseObject.AdvancedPolls.ServiceURL;
+			pollMobileLayer.ServiceUrl = responseObject.AdvancedPolls.ServiceURL;
+			advButton.title = intl.SwitchTooltip + advPolls.NameOfRegular;
+			advButton.innerHTML = intl.SwitchTooltip + advPolls.NameOfRegular;
+			dojo.byId("lblAppName").innerHTML = "<img alt='' src='" + responseObject.ApplicationIcon + "'>" + responseObject.ApplicationName + " &bull; " + advPolls.NameOfAdvanced;
 		}
 		else {
-			Td0.title = SwitchTooltip + advPolls.NameOfAdvanced;
-			Td0.innerHTML = SwitchTooltip + advPolls.NameOfAdvanced;
+			advButton.title = intl.SwitchTooltip + advPolls.NameOfAdvanced;
+			advButton.innerHTML = intl.SwitchTooltip + advPolls.NameOfAdvanced;
 		}
 	}
 	//End of CanMod
-    pollMobileLayer = responseObject.PollMobileLayer;
     precinctLayer = responseObject.PrecinctLayer;
     precinctOfficeLayer = responseObject.PrecinctOfficeLayer;
     baseMapLayers = responseObject.BaseMapLayers;
@@ -518,17 +407,6 @@ function Initialize(responseObject) {
 
     dojo.connect(map, "onClick", FindLocation);
 
-    // Set address search parameters
-	dojo.byId("txtAddress").setAttribute("defaultAddress", responseObject.LocatorSettings.DefaultValue);
-	dojo.byId('txtAddress').setAttribute("placeholder",responseObject.LocatorSettings.DefaultValue); //CanMod: Set as placeholder instead of value
-    dojo.byId("txtAddress").setAttribute("defaultAddressTitle", responseObject.LocatorSettings.DefaultValue);
-    dojo.byId("txtAddress").style.color = "gray";
-    dojo.connect(dojo.byId('txtAddress'), "ondblclick", ClearDefaultText);
-    dojo.connect(dojo.byId('txtAddress'), "onfocus", function (evt) {
-        this.style.color = "#FFF";
-    });
-    dojo.connect(dojo.byId('txtAddress'), "onblur", ReplaceDefaultText);
-
     for (var index in pollingPlaceData) {
         if (pollingPlaceData[index].ShowDirection) {
             routeTask = new esri.tasks.RouteTask(responseObject.RouteServiceURL);
@@ -539,13 +417,9 @@ function Initialize(responseObject) {
         }
     }
 
-    dojo.connect(dojo.byId('imgHelp'), "onclick", function () {
+    dojo.connect(dojo.byId('helpButton'), "onclick", function () {
         window.open(responseObject.HelpURL);
     });
-	//CanMod: Display the search address on startup
-	if (!isMobileDevice && locatorSettings.ShowSearchOnStartup) {
-		ShowLocateContainer();
-	}
 }
 
 //Function to create graphics and feature layer
@@ -570,7 +444,6 @@ function MapInitFunction() {
         CreateOfficeDataLayOut();
     }
     else {
-        SetAddressResultsHeight();
         SetHeightComments();
         SetHeightViewDetails();
         SetHeightViewDirections();
@@ -977,6 +850,38 @@ function ClearSelection() {
     dojo.byId('imgToggleResults').title = "";
 	dojo.byId("imgPrint").style.cursor = "default"; //CanMod: Print button behavior
 	dojo.byId('imgPrint').title = ""; //CanMod: Print button behavior
+}
+
+function Internationalization() {
+	dojo.byId('searchTitle').innerHTML = intl.SearchTitle;
+	dojo.byId("searchButton").title = intl.SearchTooltip;
+	dojo.byId("searchButton").alt = intl.SearchTooltip;
+	dojo.byId("searchSubmit").title = intl.LocateTooltip;
+	
+	dojo.byId("shareTitle").innerHTML = intl.ShareTitle;
+	dojo.byId("shareButton").title = intl.ShareTooltip;
+	dojo.byId("shareButton").alt = intl.ShareTooltip;
+	dojo.byId("imgMail").title = intl.EmailTooltip;
+	
+	dojo.byId("geolocateButton").title = intl.GeolocateTooltip;
+	dojo.byId("geolocateButton").alt = intl.GeolocateTooltip;
+	if (!isMobileDevice) { //Element only created on desktop browsers
+		dojo.byId("basemapButton").title = intl.BasemapTooltip;
+	}
+	dojo.byId("helpButton").title = intl.HelpTooltip;
+	
+	dojo.byId("imgComments").title = intl.CommentsTooltip;
+	dojo.byId("divCommentsHeader").innerHTML = intl.CommentsTitle;
+	dojo.query("#divCommentsView td")[1].innerHTML = intl.AddComment;
+	dojo.setAttr(dojo.byId("txtComments"),"placeholder",intl.EnterComment);
+	dojo.query("#btnAddComments")[0].innerHTML = intl.SubmitButton;
+	dojo.byId("btnCancelComments").innerHTML = intl.CancelButton;
+	
+	closeButtons = dojo.query("img[title='Close']");
+	dojo.setAttr(closeButtons[0],"title",intl.CloseTooltip);
+	dojo.byId("tdInfoHeader").innerHTML = dojo.string.substitute(intl.MobileHeader,[pollingPlaceLabel]);
+	dojo.byId("printHeader").innerHTML = intl.PrintTooltip; //Print iframe window header
+	dojo.byId("zoomInAlert").innerHTML = dojo.byId("zoomInAlert").innerHTML + intl.zoomInAlert + pollingPlacePlural.toLowerCase();
 }
 
 dojo.addOnLoad(init);

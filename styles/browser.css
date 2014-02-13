@@ -21,17 +21,6 @@
  */
 /* This file contains the mobile specific style settings for "Election Polling Place" template */
 /* The common settings for the styles are defined in "electionPollingPlace.css" */
-/* Use this file to perform the following: */
-/* 1.  Set the body styles                      - { Style(s) to look for: html, body } */
-/* 2.  Set styles for icons, buttons and header styles
-                                                - { Style(s) to look for: customButton,tableHeader,tdHeader,imgOptions,imgShare}*/
-/* 3.  Set the styles for search container      - { Style(s) to look for: divAddressContainer,divAddressContent,txtAddress,imgLocate}*/
-/* 4.  Set the styles for basemap container      - { Style(s) to look for: divLayerContainer,divLayerHolder,selectedBaseMap}*/
-/* 5.  Set the styles for info window           - { Style(s) to look for: divInfoWindowContainer .content,divInfoWindowContainer .title,infoOptions,spanContentText}*/
-/* 6.  Set the styles for bottom panel          - { Style(s) to look for: transparentBackground,divDefaultHeader,divSelectedHeader,divShowHeader}*/
-/* 7.  Set the styles for esri slider           - { Style(s) to look for: esriSimpleSlider}*/
-/* 8.  Set the styles for floating information  - { Style(s) to look for: floatInfo}*/
-/* 9.  Set the styles for the print div         - { Style(s) to look for: printWindow, printClose }*/
 
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Styles for body*/
@@ -48,7 +37,7 @@ body,html
     height: 30px !important;
     width: 30px !important;
     vertical-align: middle;
-    padding:0px 5px 0px 0px;
+    padding:0px 3px 0px 0px;
     cursor:pointer;
 }
 
@@ -73,36 +62,17 @@ body,html
 
 /*---------------------------------------------------------------------------------------------------------*/
 /*Styles for address container*/
-.divAddressHolder
-{
-    z-index: 1000;
-    position:absolute;
-    top: 60px;
-    right: 15px;
-    width: 300px;
-}
-.divAddressContent
-{
-    height:300px;
-     background-color: #585858;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
-    behavior: url("styles/PIE.htc");
+
+/*IE 7 Styling*/
+.searchBlock {
+	top: 50px;
+	height: 230px;
 }
 
-.txtAddress
-{
-    height:30px !important;
-    font-size:11px !important;
-    font-family: Verdana !important;
-    line-height: 30px;
-}
-
-.imgLocate
-{
-    height: 30px !important;
-    width: 30px !important;
+.searchBlock  #autocomplete div{
+	width: 240px;
+	white-space: pre;
+	word-wrap: break-word;
 }
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -111,18 +81,18 @@ body,html
 .divLayerContainer
 {
     position: absolute;
-    top: 60px;
-    right: 15px;
+    top: 50px;
+    right: 5px;
     width: 260px;
     z-index: 1000;
+	font-size:11px;
 }
 
 .divLayerHolder
 {
     width: 260px;
     height:115px;
-    background: rgb(56,164,69); /*CanMod rgba(0,0,0,0.9);*/
-    -pie-background: rgb(56,164,69); /*CanMod rgba(0,0,0,0.9);*/
+    background: #468544;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     border-radius: 5px;
@@ -130,11 +100,7 @@ body,html
 }
 .selectedBaseMap
 {
-    -webkit-box-shadow: 0 0 15px #63BA65;
-    -moz-box-shadow: 0 0 15px #63BA65;
-    box-shadow: 0 0 15px #63BA65;
-    filter: progid:DXImageTransform.Microsoft.Glow(color='#8EAE21', Strength='4');
-    behavior: url("styles/PIE.htc");
+    outline: white 3px solid;
 }
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -174,12 +140,18 @@ body,html
 }
 
 /*---------------------------------------------------------------------------------------------------------*/
+/* Share Container*/
+.divAppContainer
+{
+	font-size: 11px;
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
 /* bottom panel css*/
 
 .transparentBackground
 {
-    background: rgb(56,164,69); /*CanMod rgba(0,0,0,0.9)*/
-    -pie-background: rgb(56,164,69); /*CanMod rgba(0,0,0,0.9)*/
+    background: #468544;
     vertical-align: middle;
     behavior: url("styles/PIE.htc");
 }
@@ -188,7 +160,7 @@ body,html
 /* esri slider style*/
 .esriSimpleSlider
 {
-    top: 90px !important;
+    top: 65px !important;
 }
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -196,13 +168,12 @@ body,html
 .floatInfo
 {
 	position:absolute;
-	top:94px;
+	top:70px;
 	z-index:30;
 	left:60px;
 	color:white;
-	background-color:
-	rgb(56,164,69);
-	background-color: rgba(56,164,69,0.7);
+	background-color: rgb(70,133,68);
+	background-color: rgba(70,133,68,0.7);
 	padding:5px;
 	border-radius: 5px;
 	font-size:small;
@@ -218,7 +189,7 @@ body,html
 	position:absolute;
 	top:55px;
 	left:10px;
-	background-color:#38a44f;
+	background-color:#468544;
 	padding: 5px;
 	color:white;
 	cursor:default;
@@ -234,16 +205,4 @@ body,html
 	width: 20px;
 	height: 20px;
 	cursor: pointer;
- }
- /*---------------------------------------------------------------------------------------------------------*/
- /*CanMod: Adjustements to prevent header title wrapping*/
- .tableHeader
- {
-	table-layout: fixed;
- }
- #lblAppNameText
- {
-	text-overflow:ellipsis;
-	white-space:nowrap;
-	overflow:hidden;
  }

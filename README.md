@@ -1,5 +1,5 @@
 ### polling-place-locator
-## ArcGIS for Canadian Municipalities - Polling Place Locator 10.2
+## ArcGIS for Canadian Municipalities - Polling Place Locator 10.2.0.1
 
 The Polling Place Locator helps voters find their polling place location, obtain driving directions, comment on the polling place and get information about their candidates.
 

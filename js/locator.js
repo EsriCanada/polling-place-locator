@@ -19,26 +19,52 @@
  | See the License for the specific language governing permissions and
  | limitations under the License.
  */
-//Get candidate results for searched address
-function LocateAddress() {
-    var thisSearchTime = lastSearchTime = (new Date()).getTime();
-    noRoute = false;
-    dojo.byId("imgSearchLoader").style.display = "block";
-    if (dojo.byId("txtAddress").value.trim() == '') {
-        dojo.byId("imgSearchLoader").style.display = "none";
-        RemoveChildren(dojo.byId('tblAddressResults'));
-        CreateScrollbar(dojo.byId("divAddressScrollContainer"), dojo.byId("divAddressScrollContent"));
-        if (dojo.byId("txtAddress").value != "") {
-            alert(messages.getElementsByTagName("addressToLocate")[0].childNodes[0].nodeValue);
-        }
+//First function called while locating address
+function LocateAddressCML2(suggest,event) {
+	noRoute = false;
+	//On selection of options with arrow keys, do not locate
+	if (event) {
+		var kc = event.keyCode;
+		if (kc == dojo.keys.DOWN_ARROW || kc == dojo.keys.UP_ARROW || kc == dojo.keys.TAB) {
+			if(timeouts.autocomplete != null) {clearTimeout(timeouts.autocomplete); timeouts.autocomplete = null;}
+			return;
+		}
+	}
+	
+	//If selection made, do not proceed to new locator search
+	if (!suggest && document.getElementById("autocompleteSelect") && document.getElementById("autocompleteSelect").selectedIndex >= 0) {
+		var zCandidate = lastSearchResults[document.getElementById("autocompleteSelect").selectedIndex];
+		lastSearchString = zCandidate.attributes[locatorSettings.DisplayFieldCML2];
+		document.getElementById("searchInput").value = lastSearchString;
+		clearAutocomplete();
+		mapPoint = zCandidate.location;
+		LocateGraphicOnMap(true);
+		return;
+	}
+	
+	//No autocomplete on mobile devices (too unreliable due to device processing speeds)
+	if ((isMobileDevice || isTablet) & suggest) {
+		return;
+	}
+
+    map.infoWindow.hide();
+    selectedGraphic = null;
+	var currSearch = dojo.byId("searchInput").value.trim();
+    if (currSearch === '' || (currSearch == lastSearchString && suggest) || (currSearch.length < 4 && suggest/*No auto-suggest for small*/)) {
+		if (currSearch != lastSearchString) {
+			lastSearchString = currSearch;
+			clearAutocomplete();
+		}
         return;
     }
-    var params = [];
+	if(timeouts.autocomplete != null) {clearTimeout(timeouts.autocomplete); timeouts.autocomplete = null;}
+	lastSearchString = currSearch;
+	var params = [];
 	//CanMod: Modify locator to search in set extent only (makes it uncessary to type city, province, etc in the search field)
-    params["address"] = {};
-	params["address"][locatorSettings.LocatorParameters[0]] = dojo.byId('txtAddress').value;
+	params["address"] = {};
+	params["address"][locatorSettings.LocatorParamaters] = currSearch;
 	se = locatorSettings.SearchExtent;
-	params.outFields = [locatorSettings.LocatorFieldName];
+	params.outFields = [locatorSettings.CandidateFields];
 	if (se.wkid == 4326) {
 		params.searchExtent = new esri.geometry.Extent(se.xmin,se.ymin,se.xmax,se.ymax, new esri.SpatialReference({ wkid:se.wkid }));
 	}
@@ -48,117 +74,82 @@ function LocateAddress() {
 			params.searchExtent = webMercatorUtils.webMercatorToGeographic(se_Original);
 		});
 	}
-    var locator1 = new esri.tasks.Locator(locatorSettings.LocatorURL);
-    locator1.outSpatialReference = map.spatialReference;
-    locator1.addressToLocations(params, function (candidates) {
-        // Discard searches made obsolete by new typing from user
-        if (thisSearchTime < lastSearchTime) {
-            return;
-        }
-        ShowLocatedAddress(candidates);
+    var locatorCML2 = new esri.tasks.Locator(locatorSettings.LocatorURL);
+    locatorCML2.outSpatialReference = map.spatialReference;
+	autocomplete(locatorCML2,currSearch,params,suggest);
+}
+
+// Discard searches made obsolete by new typing from user
+function autocomplete(locatorCML2,currSearch,params,suggest) {
+	locatorCML2.addressToLocations(params, function (candidates) {
+		if (currSearch != dojo.byId("searchInput").value.trim()) {
+			return;
+		}
+		ShowLocatedAddressCML2(candidates,suggest);
     },
-    function (err) {
-        dojo.byId("imgSearchLoader").style.display = "none";
-        selectedPollPoint = null;
-        featureID = null;
-        LoctorErrBack("unableToLocate");
+	function (err) {
+		console.error(err);
     });
 }
 
-//Populate candidate address list in address container
-function ShowLocatedAddress(candidates) {
-    RemoveChildren(dojo.byId('tblAddressResults'));
-    CreateScrollbar(dojo.byId("divAddressScrollContainer"), dojo.byId("divAddressScrollContent"));
+function ShowLocatedAddressCML2(candidates,suggest) {
+	//Keep top 10 candidates that pass minimum score from config file
+	candidates = dojo.filter(candidates, function(item) {
+		if (dojo.indexOf(locatorSettings.LocatorFieldValues, item.attributes[locatorSettings.LocatorFieldName]) >= 0) {
+			return item.score > locatorSettings.AddressMatchScore;
+		}
+		else {return false;}
+	});
+	if (candidates.length > 10) {
+		candidates = candidates.slice(0,10);
+	}
 
     if (candidates.length > 0) {
-        var table = dojo.byId("tblAddressResults");
-        var tBody = document.createElement("tbody");
-        table.appendChild(tBody);
-        table.cellSpacing = 0;
-        table.cellPadding = 0;
-
-        //Filter and display valid address results according to locator settings in configuration file
-        var counter = 0;
-        for (var i = 0; i < candidates.length; i++) {
-            if (candidates[i].score > locatorSettings.AddressMatchScore) {
-                for (var bMap = 0; bMap < baseMapLayers.length; bMap++) {
-                    if (map.getLayer(baseMapLayers[bMap].Key).visible) {
-                        var bmap = baseMapLayers[bMap].Key;
-                    }
-                }
-
-                if (map.getLayer(bmap).fullExtent.contains(candidates[i].location)) {
-                    for (j in locatorSettings.LocatorFieldValues) {
-                        if (candidates[i].attributes[locatorSettings.LocatorFieldName] == locatorSettings.LocatorFieldValues[j]) {
-                            counter++;
-                            var candidate = candidates[i];
-                            var tr = document.createElement("tr");
-                            tBody.appendChild(tr);
-                            var td1 = document.createElement("td");
-                            td1.innerHTML = candidate.address;
-                            td1.align = "left";
-                            td1.className = 'bottomborder';
-                            td1.style.cursor = "pointer";
-                            td1.height = 20;
-                            td1.setAttribute("x", candidate.location.x);
-                            td1.setAttribute("y", candidate.location.y);
-                            td1.setAttribute("address", candidate.address);
-                            td1.onclick = function () {
-                                dojo.byId("txtAddress").value = this.innerHTML;
-                                lastSearchString = dojo.byId("txtAddress").value.trim();
-                                dojo.byId('txtAddress').setAttribute("defaultAddress", this.innerHTML);
-                                dojo.byId("txtAddress").setAttribute("defaultAddressTitle", this.innerHTML);
-                                mapPoint = new esri.geometry.Point(this.getAttribute("x"), this.getAttribute("y"), map.spatialReference);
-                                LocateGraphicOnMap(true);
-                            }
-                            tr.appendChild(td1);
-                        }
-                    }
-                }
-            }
-        }
-
-        //Display error message if there are no valid candidate addresses
-        if (counter == 0) {
-            var tr = document.createElement("tr");
-            tBody.appendChild(tr);
-            var td1 = document.createElement("td");
-            td1.innerHTML = messages.getElementsByTagName("noSearchResults")[0].childNodes[0].nodeValue;
-            tr.appendChild(td1);
-            dojo.byId("imgSearchLoader").style.display = "none";
-            return;
-        }
-        dojo.byId("imgSearchLoader").style.display = "none";
-        SetAddressResultsHeight();
-    }
-    else {
-        dojo.byId("imgSearchLoader").style.display = "none";
-        map.infoWindow.hide();
-        selectedPollPoint = null;
-        pollPoint = null;
-        mapPoint = null;
-        featureID = null;
-        ClearSelection();
-        map.getLayer(tempGraphicsLayerId).clear();
-        map.getLayer(precinctLayerId).clear();
-        map.getLayer(routeGraphicsLayerId).clear();
-        map.getLayer(highlightPollLayerId).clear();
-        if (!isMobileDevice) {
-            var imgToggle = dojo.byId('imgToggleResults');
-            if (imgToggle.getAttribute("state") == "maximized") {
-                imgToggle.setAttribute("state", "minimized");
-                WipeOutResults();
-                dojo.byId('imgToggleResults').src = "images/up.png";
-                dojo.byId('imgToggleResults').title = ShowPanelTooltip; //CanMod
-				dojo.byId('imgPrint').title = PrintTooltip; //CanMod: Print button behavior
-            }
-        }
-        LoctorErrBack("noSearchResults");
+		lastSearchResults = candidates;
+		
+		if (suggest) {
+			var sel = document.createElement("select");
+			sel.setAttribute("size",String(candidates.length));
+			sel.setAttribute("id","autocompleteSelect");
+			sel.setAttribute("onclick","LocateAddressCML2(false);");
+			sel.setAttribute("onkeyup","if (event.keyCode == dojo.keys.ENTER) {LocateAddressCML2(false);} if (event.keyCode == dojo.keys.ESCAPE) {clearAutocomplete();}");
+			dojo.forEach(candidates,function(item,i) {
+				var opt = document.createElement("option");
+				opt.innerHTML = item.attributes[locatorSettings.DisplayFieldCML2];
+				sel.appendChild(opt);
+			});
+			clearAutocomplete();
+			document.getElementById("autocomplete").appendChild(sel);
+		}
+		else {
+			var zCandidate = lastSearchResults[0];
+			lastSearchString = zCandidate.attributes[locatorSettings.DisplayFieldCML2];
+			clearAutocomplete();
+			mapPoint = zCandidate.location;
+			LocateGraphicOnMap(true);
+		}
+    } else {
+		var alert = document.createElement("div");
+		alert.innerHTML = messages.getElementsByTagName("noSearchResults")[0].childNodes[0].nodeValue + "<hr>" + locatorSettings.Example;
+		if(timeouts.autocomplete != null) {clearTimeout(timeouts.autocomplete); timeouts.autocomplete = null;}
+		if (suggest) {
+			timeouts.autocomplete = setTimeout(function() { //Reduce sporadic appearances of "No Results" as user types
+				timeouts.autocomplete = null;
+				clearAutocomplete();
+				document.getElementById("autocomplete").appendChild(alert);
+			},1000);
+		}
+		else {
+			alert.setAttribute("role","alert"); //Alert screen reader users on form submission that no results found
+			clearAutocomplete();
+			document.getElementById("autocomplete").appendChild(alert);
+		}
     }
 }
 
 //Locate searched address on map with pushpin graphic
 function LocateGraphicOnMap(loc) {
+	showCandidates = true;
     map.infoWindow.hide();
     selectedPollPoint = null;
     featureID = null;
@@ -180,10 +171,9 @@ function LocateGraphicOnMap(loc) {
                 imgToggle.setAttribute("state", "minimized");
                 WipeOutResults();
                 dojo.byId('imgToggleResults').src = "images/up.png";
+				dojo.byId('imgToggleResults').title = intl.ShowPanelTooltip;
             }
         }
-        HideAddressContainer();
-        HideProgressIndicator();
         alert(messages.getElementsByTagName("noDataAvlbl")[0].childNodes[0].nodeValue);
         return;
     }
@@ -225,23 +215,5 @@ function LocateGraphicOnMap(loc) {
             GetOfficeName(electedOfficialsTabData[index].URL, electedOfficialsTabData[index].Data, index);
         }
     }
-    HideAddressContainer();
-}
-
-//This function is called when locator service fails or does not return any data
-function LoctorErrBack(val) {
-    RemoveChildren(dojo.byId('tblAddressResults'));
-    CreateScrollbar(dojo.byId("divAddressScrollContainer"), dojo.byId("divAddressScrollContent"));
-
-    var table = dojo.byId("tblAddressResults");
-    var tBody = document.createElement("tbody");
-    table.appendChild(tBody);
-    table.cellSpacing = 0;
-    table.cellPadding = 0;
-
-    var tr = document.createElement("tr");
-    tBody.appendChild(tr);
-    var td1 = document.createElement("td");
-    td1.innerHTML = messages.getElementsByTagName(val)[0].childNodes[0].nodeValue;
-    tr.appendChild(td1);
+	showHideSearch(true);
 }

@@ -21,13 +21,6 @@
  */
 /* This file contains the mobile specific style settings for "Election Polling Place" template */
 /* The common settings for the styles are defined in "electionPollingPlace.css" */
-/* Use this file to perform the following: */
-/* 1.  Set the body styles                      - { Style(s) to look for: html, body } */
-/* 2.  Set styles for icons, buttons and header styles
-                                                - { Style(s) to look for: customButton,tableHeader,tdHeader,imgOptions,imgShare}*/
-/* 3.  Set the styles for search container      - { Style(s) to look for: divAddressContainer,divAddressContent,txtAddress,imgLocate}*/
-/* 4.  Set the styles for info window           - { Style(s) to look for: divInfoWindowContainer .content,divInfoWindowContainer .title,infoOptions,spanContentText}*/
-/* 5.  Set the styles for esri slider           - { Style(s) to look for: esriSimpleSlider}*/
 
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Styles for body*/
@@ -39,10 +32,6 @@ html, body
 
 /*---------------------------------------------------------------------------------------------------------*/
 /*styles for icons, buttons and header styles*/
-.tableHeader
-{
-    width: 200px;
-}
 
 .tdHeader
 {
@@ -58,43 +47,27 @@ html, body
     vertical-align: middle;
 }
 
+.divLayerContainer {
+	display: none;
+}
+
 /*---------------------------------------------------------------------------------------------------------*/
 /*Styles for address container*/
-
-.divAddressContainer
-{
-    top: 0px;
-    left: 0px;
-    background: rgba(0,0,0,0.9);
-    position: absolute;
-    z-index: 1008;
-    width: 100%;
-    height: 100%;
-}
-.divAddressHolder
-{
-   z-index: 1008;
-   width: 100%;
-   height: 100%;
-     background-color: rgba(98, 98, 98,.95);
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
-    -webkit-box-shadow: 0 0 10px #fff;
-    -moz-box-shadow: 0 0 10px #fff;
-    -o-box-shadow: 0 0 10px #fff;
-    box-shadow: 0 0 10px #fff;
-}
-
-.imgLocate
-{
-    height: 44px !important;
-    width: 44px !important;
-}
 
 .bottomborder
 {
     height :40px;
+}
+/*--*/
+.searchBlock {
+	top: 50px;
+	border-radius: 5px;
+	height: 120px;
+}
+
+.searchBlock  #autocomplete div{
+	width: 240px;
+	white-space: pre-line;
 }
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -106,7 +79,7 @@ html, body
 
 .divInfoContent
 {
-    background-color: rgba(98, 98, 98,.95);
+    background-color: #468544;
     width: 100%;
     height: 100%;
     -moz-border-radius: 8px;
@@ -141,6 +114,7 @@ html, body
 .divAppContainer
 {
    z-index: 1006;
+   font-size: 15px;
 }
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -164,14 +138,6 @@ html, body
         width:270px !important;
         height:130px !important;
     }
-     .txtAddress
-    {
-      height: 44px !important;
-      font-size: 15px !important;
-      font-family: Verdana !important;
-      width: 85% !important;
-      padding: 0px !important;
-    }
     .divCommentsContent,.divInfoDetailsScroll,.divInfoDirectionsScroll
     {
       width: 95% !important;
@@ -188,14 +154,6 @@ html, body
     {
         width:420px !important;
         height:85px !important;
-    }
-    .txtAddress
-    {
-      height: 44px !important;
-      font-size: 15px !important;
-      font-family: Verdana !important;
-      width: 90% !important;
-      padding: 0px !important;
     }
     .divCommentsContent,.divInfoDetailsScroll,.divInfoDirectionsScroll
     {

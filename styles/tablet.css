@@ -21,15 +21,6 @@
  */
 /* This file contains the mobile specific style settings for "Election Polling Place" template */
 /* The common settings for the styles are defined in "electionPollingPlace.css" */
-/* Use this file to perform the following: */
-/* 1.  Set the body styles                      - { Style(s) to look for: html, body } */
-/* 2.  Set styles for icons, buttons and header styles
-                                                - { Style(s) to look for: customButton,tableHeader,tdHeader,imgOptions,imgShare}*/
-/* 3.  Set the styles for search container      - { Style(s) to look for: divAddressContainer,divAddressContent,txtAddress,imgLocate}*/
-/* 4.  Set the styles for basemap container      - { Style(s) to look for: divLayerContainer,divLayerHolder,selectedBaseMap}*/
-/* 5.  Set the styles for info window           - { Style(s) to look for: divInfoWindowContainer .content,divInfoWindowContainer .title,infoOptions,spanContentText}*/
-/* 6.  Set the styles for bottom panel          - { Style(s) to look for: transparentBackground,divDefaultHeader,divSelectedHeader,divShowHeader}*/
-/* 7.  Set the styles for esri slider           - { Style(s) to look for: esriSimpleSlider}*/
 
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Styles for body*/
@@ -55,41 +46,30 @@ html, body
 }
 
 /*---------------------------------------------------------------------------------------------------------*/
+/* Share Container*/
+.divAppContainer
+{
+	font-size: 14px;
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
 /*Styles for address container*/
-.divAddressHolder
-{
-    z-index: 1000;
-    position:absolute;
-    top: 60px;
-    right: 15px;
-    width: 300px;
-}
-.divAddressContent
-{
-    height:300px;
-    background-color: rgba(98, 98, 98,.95);
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
-}
-
-.imgLocate
-{
-    height: 44px !important;
-    width: 44px !important;
-}
-
-.txtAddress
-{
-    font-size: 14px !important;
-    width:230px !important;
-    font-family: Verdana !important;
-    height:44px;
-}
 
 .bottomborder
 {
     height :30px;
+}
+
+/*--*/
+.searchBlock {
+	top: 50px;
+	border-radius: 5px;
+	height: 120px;
+}
+
+.searchBlock  #autocomplete div{
+	width: 240px;
+	white-space: pre-line;
 }
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -98,19 +78,18 @@ html, body
 .divLayerContainer
 {
     position: absolute;
-    top: 60px;
-    right: 15px;
+    top: 50px;
+    right: 5px;
     width: 225px;
     z-index: 1000;
+	font-size: 14px
 }
 
 .divLayerHolder
 {
     width: 225px;
     height:100px;
-     background: rgba(0,0,0,0.9);
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
+    background: #468544;
     border-radius: 5px;
 }
 
@@ -126,18 +105,7 @@ html, body
 }
 .selectedBaseMap
 {
-    -webkit-box-shadow: 0 0 15px #63BA65;
-    -moz-box-shadow: 0 0 15px #63BA65;
-    box-shadow: 0 0 15px #63BA65;
-    filter: progid:DXImageTransform.Microsoft.Glow(color='#8EAE21', Strength='4');
-}
-
-/*---------------------------------------------------------------------------------------------------------*/
-/* Header icon Styles*/
-
-.imgApp
-{
-    width: 64px;
+    outline: white 3px solid;
 }
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -165,8 +133,6 @@ html, body
     font-family: Verdana !important;
     height:75px !important;
     width: 285px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -175,7 +141,7 @@ html, body
 
 .transparentBackground
 {
-    background: rgba(0,0,0,0.9);
+    background: #468544;
     vertical-align: middle;
 }
 
@@ -198,17 +164,5 @@ html, body
 /* esri slider style*/
 .esriSimpleSlider
 {
-    top: 90px !important;
+    top: 65px !important;
 }
- /*---------------------------------------------------------------------------------------------------------*/
- /*CanMod: Adjustements to prevent header title wrapping*/
- .tableHeader
- {
-	table-layout: fixed;
- }
- #lblAppNameText
- {
-	text-overflow:ellipsis;
-	white-space:nowrap;
-	overflow:hidden;
- }

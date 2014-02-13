@@ -97,7 +97,7 @@ function ShowRoute(solveResult) {
     map.getLayer(routeGraphicsLayerId).add(new esri.Graphic(directions.mergedGeometry, routeSymbol));
 	setTimeout(function(){
 		if (!map.extent.contains(directions.extent.expand(1.5))) map.setExtent(map.extent.union(directions.extent).expand(3)); //CanMod: Set extent of map to cover whole route
-	},300);
+	},600);
 
     if (!isMobileDevice) {
         var divSegmentContainer = document.createElement("div");
@@ -156,20 +156,20 @@ function ShowRoute(solveResult) {
         }
         else {
             tableSummary.style.height = "5%";
-            tableSummary.style.borderTop = "2px solid #A5A5A5";
-            tableSummary.style.borderBottom = "2px solid #A5A5A5";
+            tableSummary.style.borderTop = "1px solid white";
+            tableSummary.style.borderBottom = "1px solid white";
         }
         tableSummary.appendChild(tbodySummary);
 
 
         var trSummary = document.createElement("tr");
         var tdTotalDistance = document.createElement("td");
-        tdTotalDistance.innerHTML = DistanceLabel + ": " + FormatDistance(directions.totalLength, unitConfig.DirectionsLengthLabel); //CanMod: Replace label with variable
+        tdTotalDistance.innerHTML = intl.DistanceLabel + ": " + FormatDistance(directions.totalLength, unitConfig.DirectionsLengthLabel); //CanMod: Replace label with variable
         tdTotalDistance.align = "left";
 
         var tdTotalTime = document.createElement("td");
         tdTotalTime.className = "tdTotalTime";
-        tdTotalTime.innerHTML = DurationLabel + ": " + FormatTime(directions.totalTime); //CanMod
+        tdTotalTime.innerHTML = intl.DurationLabel + ": " + FormatTime(directions.totalTime); //CanMod
         tdTotalTime.align = "center";
 
         trSummary.appendChild(tdTotalDistance);
@@ -217,7 +217,7 @@ function ShowRoute(solveResult) {
                         td.innerHTML = feature.attributes.text.replace('Location 1', map.getLayer(tempGraphicsLayerId).graphics[0].attributes.Address);
                     }
                     else {
-                        td.innerHTML = feature.attributes.text.replace('Location 1', dojo.byId("txtAddress").value);
+                        td.innerHTML = feature.attributes.text.replace('Location 1', dojo.byId("searchInput").value);
                     }
                 }
             }
@@ -269,7 +269,7 @@ function CreateDirectionsScrollBar() {
     var hanHeight = parseInt(dojo.byId("divSegmentContainerscrollbar_handle").style.height.split("p"));
     if (hanHeight) {
         dojo.byId("divSegmentContainerscrollbar_handle").style.height = (hanHeight + 6) + "px";
-        dojo.byId("divSegmentContainerscrollbar_track").style.backgroundColor = "#666666";
+        dojo.byId("divSegmentContainerscrollbar_track").style.backgroundColor = "#E6FAE6";
     }
 }
 

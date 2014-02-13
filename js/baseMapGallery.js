@@ -126,12 +126,7 @@ function ShowBaseMaps() {
         dojo.replaceClass("divAppContainer", "hideContainerHeight", "showContainerHeight");
         dojo.byId('divAppContainer').style.height = '0px';
     }
-    if (!isMobileDevice) {
-        if (dojo.coords("divAddressHolder").h > 0) {
-            dojo.replaceClass("divAddressHolder", "hideContainerHeight", "showContainerHeight");
-            dojo.byId('divAddressHolder').style.height = '0px';
-        }
-    }
+	showHideSearch(true);
     var cellHeight = (isTablet) ? 100 : 115;
     if (dojo.coords("divLayerContainer").h > 0) {
         dojo.replaceClass("divLayerContainer", "hideContainerHeight", "showContainerHeight");

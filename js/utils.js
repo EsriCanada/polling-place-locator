@@ -63,7 +63,7 @@ function CreatePollingDetailsScrollBar(container, content) {
     CreateScrollbar(dojo.byId(container), dojo.byId(content));
     dojo.byId(container + "scrollbar_track").style.top = dojo.coords(dojo.byId(content)).t + "px";
     dojo.byId(container + "scrollbar_track").style.right = 3 + "px";
-    dojo.byId(container + "scrollbar_track").style.backgroundColor = "#666666";
+    dojo.byId(container + "scrollbar_track").style.backgroundColor = "#E6FAE6";
 }
 
 //Populate data in the bottom panel
@@ -224,7 +224,6 @@ function CreateScrollbar(container, content) {
             content.addEventListener('DOMMouseScroll', ScrollDiv, false);
         }
         content.onmousewheel = function (evt) {
-            console.log(content.id);
             ScrollDiv(evt);
         }
     }
@@ -773,19 +772,13 @@ function SortResultFeatures(a, b) {
 
 //Display current location of the user
 function ShowMyLocation() {
-	StopFlashSearchButton(); //CanMod
 	showCandidates = true; //CanMod
 	noRoute = false; //CanMod
     if (dojo.coords("divLayerContainer").h > 0) {
         dojo.replaceClass("divLayerContainer", "hideContainerHeight", "showContainerHeight");
         dojo.byId('divLayerContainer').style.height = '0px';
     }
-    if (!isMobileDevice) {
-        if (dojo.coords("divAddressHolder").h > 0) {
-            dojo.replaceClass("divAddressHolder", "hideContainerHeight", "showContainerHeight");
-            dojo.byId('divAddressHolder').style.height = '0px';
-        }
-    }
+	showHideSearch(true);
 
     navigator.geolocation.getCurrentPosition(
 		function (position) {
@@ -986,7 +979,6 @@ function orientationChanged() {
             if (isMobileDevice) {
                 map.reposition();
                 map.resize();
-                SetAddressResultsHeight();
                 SetHeightComments();
                 SetHeightSplashScreen();
                 SetHeightViewDetails();
@@ -1020,7 +1012,6 @@ function HideSplashScreenMessage() {
     }
     dojo.addClass('divSplashScreenContainer', "opacityHideAnimation");
     dojo.replaceClass("divSplashScreenContent", "hideContainer", "showContainer");
-	FlashSearchButton();//CanMod
 }
 
 //Set height for splash screen
@@ -1036,72 +1027,6 @@ function resizeHandler() {
         map.reposition();
         map.resize();
     }
-}
-
-//Show address container
-function ShowLocateContainer() {
-	StopFlashSearchButton(); //CanMod
-	showCandidates = true; //CanMod
-    dojo.byId('txtAddress').blur();
-
-    if (dojo.coords("divAppContainer").h > 0) {
-        dojo.replaceClass("divAppContainer", "hideContainerHeight", "showContainerHeight");
-        dojo.byId('divAppContainer').style.height = '0px';
-    }
-    if (dojo.coords("divLayerContainer").h > 0) {
-        dojo.replaceClass("divLayerContainer", "hideContainerHeight", "showContainerHeight");
-        dojo.byId('divLayerContainer').style.height = '0px';
-    }
-    if (isMobileDevice) {
-        dojo.byId('divAddressContainer').style.display = "block";
-        dojo.replaceClass("divAddressHolder", "showContainer", "hideContainer");
-        //dojo.byId("txtAddress").value = dojo.byId("txtAddress").getAttribute("defaultAddress"); //CanMod: Make use of HTML placeholder instead
-        lastSearchString = dojo.byId("txtAddress").value.trim();
-    }
-    else {
-        if (dojo.coords("divAddressHolder").h > 0) {
-            dojo.replaceClass("divAddressHolder", "hideContainerHeight", "showContainerHeight");
-            dojo.byId('divAddressHolder').style.height = '0px';
-            dojo.byId('txtAddress').blur();
-        }
-        else {
-            dojo.byId('divAddressHolder').style.height = "300px";
-            dojo.replaceClass("divAddressHolder", "showContainerHeight", "hideContainerHeight");
-            //dojo.byId("txtAddress").value = dojo.byId("txtAddress").getAttribute("defaultAddress"); //CanMod: Make use of HTML placeholder instead
-            lastSearchString = dojo.byId("txtAddress").value.trim();
-        }
-    }
-    if (dojo.byId("txtAddress").getAttribute("defaultAddress") == dojo.byId("txtAddress").getAttribute("defaultAddressTitle")) {
-        dojo.byId("txtAddress").style.color = "gray";
-    }
-    else {
-        dojo.byId("txtAddress").style.color = "#000";
-    }
-    RemoveChildren(dojo.byId('tblAddressResults'));
-    SetAddressResultsHeight();
-}
-
-//Hide address container
-function HideAddressContainer() {
-    if (isMobileDevice) {
-        setTimeout(function () {
-            dojo.byId('divAddressContainer').style.display = "none";
-        }, 500);
-        dojo.replaceClass("divAddressHolder", "hideContainerHeight", "showContainerHeight");
-    }
-    else {
-        dojo.replaceClass("divAddressHolder", "hideContainerHeight", "showContainerHeight");
-        dojo.byId('divAddressHolder').style.height = '0px';
-    }
-}
-
-//Set height and create scrollbar for address results
-function SetAddressResultsHeight() {
-    var height = (isMobileDevice) ? (dojo.window.getBox().h - 50) : dojo.coords(dojo.byId('divAddressHolder')).h;
-    if (height > 0) {
-        dojo.byId('divAddressScrollContent').style.height = (height - ((!isTablet) ? 120 : 140)) + "px";
-    }
-    CreateScrollbar(dojo.byId("divAddressScrollContainer"), dojo.byId("divAddressScrollContent"));
 }
 
 //Hide Info request container
@@ -1235,7 +1160,7 @@ function ShowServiceInfoDetails(mapPoint, attributes) {
                     else {
                         dojo.byId('imgDirections').src = "images/Details.png";
                         dojo.byId('imgDirections').setAttribute("disp", "Details");
-                        dojo.byId('imgDirections').title = DetailsTooltip; //CanMod
+                        dojo.byId('imgDirections').title = intl.DetailsTooltip; //CanMod
                         if (!showCommentsTab) {
                             dojo.byId("tdComments").style.display = "none";
                         }
@@ -1349,7 +1274,7 @@ function ServiceRequestDetails(point, attributes) {
     storeAttr = dojo.string.substitute(infoWindowHeader, attributes);
 
     if (isMobileDevice) {
-        dojo.byId('tdInfoHeader').innerHTML = dojo.string.substitute(MobileHeader,[pollingPlaceLabel]); //CanMod
+        dojo.byId('tdInfoHeader').innerHTML = dojo.string.substitute(intl.MobileHeader,[pollingPlaceLabel]); //CanMod
         var tblInfoDetails = dojo.byId('tblInfoDetails');
         var tbodyInfoDetails = document.createElement("tbody");
         tblInfoDetails.appendChild(tbodyInfoDetails);
@@ -1364,7 +1289,8 @@ function ServiceRequestDetails(point, attributes) {
                 var tdInfoDetailsHeader = document.createElement('td');
                 trInfoDetailsHeader.appendChild(tdInfoDetailsHeader);
                 var tblDtlHdr = document.createElement('table');
-                tblDtlHdr.style.backgroundColor = pollingPlaceData[ind].HeaderColor;
+                tblDtlHdr.style.paddingTop = "3px";
+                tblDtlHdr.style.borderBottom = "1px white solid";
                 tdInfoDetailsHeader.appendChild(tblDtlHdr);
                 tblDtlHdr.style.width = "100%";
                 var tbodyDtlHdr = document.createElement('tbody');
@@ -1568,13 +1494,13 @@ function ShowInfoDetailsView() {
         }
         else {
             dojo.byId('imgDirections').src = "images/Details.png";
-            dojo.byId('imgDirections').title = DetailsTooltip; //CanMod
+            dojo.byId('imgDirections').title = intl.DetailsTooltip; //CanMod
             dojo.byId('imgDirections').setAttribute("disp", "Details");
 
             dojo.byId('imgDirections').style.display = "none";
             dojo.byId("imgComments").style.display = "block";
         }
-        dojo.byId('tdInfoHeader').innerHTML = dojo.string.substitute(MobileHeader,[pollingPlaceLabel]); //CanMod
+        dojo.byId('tdInfoHeader').innerHTML = dojo.string.substitute(intl.MobileHeader,[pollingPlaceLabel]); //CanMod
     }
 }
 
@@ -1604,7 +1530,7 @@ function ShowCommentsView() {
             }
             else {
                 dojo.byId('imgDirections').src = "images/Details.png";
-                dojo.byId('imgDirections').title = DetailsTooltip; //CanMod
+                dojo.byId('imgDirections').title = intl.DetailsTooltip; //CanMod
                 dojo.byId('imgDirections').setAttribute("disp", "Details");
                 ResetCommentValues();
                 dojo.byId('imgComments').src = "images/imgDirections.png";
@@ -1646,7 +1572,7 @@ function ShowCommentsView() {
 //Trim the info window header according to mobile media screen
 function HeaderInfo() {
     if (dojo.byId('imgDirections').getAttribute("disp") == "Directions") {
-        var value = dojo.string.substitute(MobileHeader,[pollingPlaceLabel]); //CanMod
+        var value = dojo.string.substitute(intl.MobileHeader,[pollingPlaceLabel]); //CanMod
         value = value.trim();
     }
     else {
@@ -1655,7 +1581,7 @@ function HeaderInfo() {
                 var value = storeAttr.trim();
             }
             else {
-                var value = dojo.string.substitute(MobileHeader,[pollingPlaceLabel]); //CanMod
+                var value = dojo.string.substitute(intl.MobileHeader,[pollingPlaceLabel]); //CanMod
                 value = value.trim();
             }
         }
@@ -1685,7 +1611,7 @@ function ShowInfoDirectionsView() {
             }
             else {
                 dojo.byId('imgDirections').src = "images/Details.png";
-                dojo.byId('imgDirections').title = DetailsTooltip; //CanMod
+                dojo.byId('imgDirections').title = intl.DetailsTooltip; //CanMod
                 dojo.byId('imgDirections').setAttribute("disp", "Details");
 
                 dojo.byId('imgDirections').style.display = "none";
@@ -1693,13 +1619,13 @@ function ShowInfoDirectionsView() {
             }
             dojo.byId('divInfoComments').style.display = "none";
             dojo.byId('divInfoDetails').style.display = "block";
-            dojo.byId('tdInfoHeader').innerHTML = dojo.string.substitute(MobileHeader,[pollingPlaceLabel]); //CanMod
+            dojo.byId('tdInfoHeader').innerHTML = dojo.string.substitute(intl.MobileHeader,[pollingPlaceLabel]); //CanMod
             dojo.byId('divInfoDirections').style.display = "none";
             SetHeightViewDetails();
         }
         else {
             dojo.byId('imgDirections').src = "images/Details.png";
-            dojo.byId('imgDirections').title = DetailsTooltip; //CanMod
+            dojo.byId('imgDirections').title = intl.DetailsTooltip; //CanMod
             dojo.byId('imgDirections').setAttribute("disp", "Details");
             dojo.byId('divInfoComments').style.display = "none";
             dojo.byId('divInfoDetails').style.display = "none";
@@ -1801,12 +1727,7 @@ function ShareLink(ext) {
                     dojo.replaceClass("divLayerContainer", "hideContainerHeight", "showContainerHeight");
                     dojo.byId('divLayerContainer').style.height = '0px';
                 }
-                if (!isMobileDevice) {
-                    if (dojo.coords("divAddressHolder").h > 0) {
-                        dojo.replaceClass("divAddressHolder", "hideContainerHeight", "showContainerHeight");
-                        dojo.byId('divAddressHolder').style.height = '0px';
-                    }
-                }
+				showHideSearch(true);
                 var cellHeight = (isMobileDevice || isTablet) ? 81 : 60;
                 if (dojo.coords("divAppContainer").h > 0) {
                     dojo.replaceClass("divAppContainer", "hideContainerHeight", "showContainerHeight");
@@ -1908,28 +1829,6 @@ function CheckMailFormat(emailValue) {
     }
 }
 
-//Clear default value for text box controls
-function ClearDefaultText(e) {
-    var target = window.event ? window.event.srcElement : e ? e.target : null;
-    if (!target) return;
-    target.style.color = "#FFF";
-    target.value = '';
-}
-
-//Set default value on blur
-function ReplaceDefaultText(e) {
-    var target = window.event ? window.event.srcElement : e ? e.target : null;
-    if (!target) return;
-    ResetTargetValue(target, "defaultAddressTitle", "gray");
-}
-
-//Set changed value for address
-function ResetTargetValue(target, title, color) {
-	//CanMod: Removed the code that resets the txtAddress value - now using HTML5 Placeholder instead.
-    target.style.color = color;
-    lastSearchString = dojo.byId("txtAddress").value.trim();
-}
-
 //Query the features while sharing
 function ExecuteQueryTask() {
     ShowProgressIndicator();
@@ -1976,8 +1875,9 @@ function CreatePrintout() {
 		iW = wd.w -25; if (iW > 760 || iW < 150) {iW = 760;}
 		iH = wd.h -95; if (iH > 500 || iW < 150) {iH = 500;}
 	
-		var printHTML = "<h2 style='margin-bottom:-10px;'>" + dojo.byId("lblAppName").innerHTML + "</h2>"; //Title
-		printHTML += "<img src='images/print_gray.png' alt='" + PrintTooltip + "' title='" + PrintTooltip + "' style='cursor:pointer; float:right;' onclick='window.print();' class='noprint'>"; //Print button
+		var title = dojo.byId("lblAppName").innerText || dojo.byId("lblAppName").textContent;
+		var printHTML = "<h2 style='margin-bottom:-10px;'>" + title + "</h2>"; //Title
+		printHTML += "<img src='images/print_gray.png' alt='" + intl.PrintTooltip + "' title='" + intl.PrintTooltip + "' style='cursor:pointer; float:right;' onclick='window.print();' class='noprint'>"; //Print button
 		printHTML += "<h3>" + pollingPlaceLabel + "</h3>"; //Subtitle
 		
 		// If map was not created, skip it (either due to server error or print task not set in config.js)
@@ -2118,30 +2018,76 @@ function closePrint() {
 	dojo.byId("printWindow").style.display = "none";
 }
 
-//CanMod: Function to flash the search button
-function FlashSearchButton() {
- if (!isMobileDevice) {
-  buttonFlash = setInterval(function(){
-   var imgElement = dojo.query("#Td1 img")[0];
-   var imgCurrent = imgElement.src.split("/");
-   imgCurrent = imgCurrent[imgCurrent.length-1];
-   if (imgCurrent == "locate_contrast.png") {
-    imgElement.src = "images/locate.png";
-   }
-   else if (imgCurrent == "locate.png") {
-    imgElement.src = "images/locate_contrast.png";
-   }
-  },1000);
-  setTimeout(function(){
-   StopFlashSearchButton();
-  },30000);
- }
+//Clear Autocomplete
+function clearAutocomplete() {
+	document.getElementById("autocomplete").innerHTML = "";
 }
 
-//CanMod: Function to stop the search button flashing
-function StopFlashSearchButton() {
- if (!isMobileDevice) {
-  clearInterval(buttonFlash);
-  dojo.query("#Td1 img")[0].src = "images/locate.png";
- }
+//Change autocomplete selection from input using arrow keys
+function selectAutocomplete(evt) {
+	if (!(dojo.isIE < 9)) {evt.preventDefault();}
+	if (document.getElementById("autocompleteSelect")) {
+		var sel = document.getElementById("autocompleteSelect");
+		var kc = evt.keyCode;
+		if (kc == dojo.keys.DOWN_ARROW && sel.selectedIndex != sel.getAttribute("size") -1) {
+			sel.selectedIndex ++;
+			document.getElementById("searchInput").value = sel.options[sel.selectedIndex].text;
+		}
+		else if (kc == dojo.keys.UP_ARROW && sel.selectedIndex != -1) {
+			sel.selectedIndex --;
+			if (sel.selectedIndex == -1) {
+				document.getElementById("searchInput").value = lastSearchString;
+			}
+			else {
+				document.getElementById("searchInput").value = sel.options[sel.selectedIndex].text;
+			}
+		}
+	}
+	if (evt.keyCode == dojo.keys.ESCAPE) {
+		clearAutocomplete();
+	}
+}
+
+//Show/Hide the IE7/Mobile/Tablet search window
+function showHideSearch(closeOnly) {
+	var disp = dojo.byId("divAddressSearch").style.display;
+	if (disp == "block") {
+		dojo.byId("divAddressSearch").style.display = "none";
+		dojo.byId("searchButton").setAttribute("aria-expanded","false");
+	}
+	else if (disp == "none" && !closeOnly) {
+		if (dojo.coords("divAppContainer").h > 0) {
+			dojo.replaceClass("divAppContainer", "hideContainerHeight", "showContainerHeight");
+			dojo.byId('divAppContainer').style.height = '0px';
+			//CanAccess
+			/*monkey
+			document.getElementById('imgShare').setAttribute("aria-expanded",false);
+			document.getElementById('imgFacebook').tabIndex="-1";
+			document.getElementById('imgTwitter').tabIndex="-1";
+			document.getElementById('imgMail').tabIndex="-1";
+			if (timeouts.share != null) {clearTimeout(timeouts.share); timeouts.share = null;}
+			timeouts.share = setTimeout(function() {
+				timeouts.share = null;
+				dojo.byId('divAppContainer').style.display = 'none';
+			},1000);*/
+		}
+		if (dojo.coords("divLayerContainer").h > 0) {
+			dojo.replaceClass("divLayerContainer", "hideContainerHeight", "showContainerHeight");
+			dojo.byId('divLayerContainer').style.height = '0px';
+			//CanAccess
+			/*monkey
+			document.getElementById('imgBaseMap').setAttribute("aria-expanded",false);
+			dojo.forEach(dojo.query(".basemapThumbnail"), function(item,i) {
+				item.tabIndex = "-1";
+			});
+			if (timeouts.basemap != null) {clearTimeout(timeouts.basemap); timeouts.basemap = null;}
+			timeouts.basemap = setTimeout(function() {
+				timeouts.basemap = null;
+				dojo.byId('divLayerContainer').style.display = 'none';
+			},1000);
+			*/
+		}
+		dojo.byId("divAddressSearch").style.display = "block";
+		dojo.byId("searchButton").setAttribute("aria-expanded","true");
+	}
 }

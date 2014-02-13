@@ -27,7 +27,7 @@ dojo.declare("js.Config", null, {
     //
     // Utiliser ce fichier afin de configurer:
     //
-    // 1.  Le titre de l'application                      - [ Balise(s) HTML: ApplicationName ]
+    // 1.  Le titre de l'application et l'icône           - [ Balise(s) HTML: ApplicationName, WindowTitle, ApplicationIcon ]
     // 2.  Le message de l'écran de garde                 - [ Balise(s) HTML: SplashScreenMessage ]
     // 3.  L'URL pour la page d'aide                      - [ Balise(s) HTML: HelpURL ]
     // 4.  Les mots de localisation                       - [ Balise(s) HTML: PollingPlaceLabel, CandidatesTabLabel ]
@@ -50,30 +50,35 @@ dojo.declare("js.Config", null, {
     // 9.  La recherche par addresse                      - [ Balise(s) HTML: LocatorSettings ]
     //
     // 10. Le service de géométrie et les Printing Tools  - [ Balise(s) HTML: GeometryService, PrintingService ]
+	//
+	// 11. Le bouton de bascule de la langue              - [ Balise(s) HTML: LanguageButton ]
     //
-    // 11. Les option de routage et de l'itinéraire       - [ Balise(s) HTML: RouteServiceURL, ArcGISOnlineClientID DirectionsLanguage,
+    // 12. Les option de routage et de l'itinéraire       - [ Balise(s) HTML: RouteServiceURL, ArcGISOnlineClientID DirectionsLanguage,
     //                                                                        RouteColor, RouteWidth ]
-    // 11a.Destination du routage                         - [ Balise(s) HTML: GenerateRouteToNonDesignatedPollingPlace <true/false> ]
-    // 11b.L'unité de mesure                              - [ Balise(s) HTML: UnitConfig ]
+    // 12a.Destination du routage                         - [ Balise(s) HTML: GenerateRouteToNonDesignatedPollingPlace <true/false> ]
+    // 12b.L'unité de mesure                              - [ Balise(s) HTML: UnitConfig ]
     //
-    // 12. Les donnés dans le bas de page                 - [ Balise(s) HTML: InfoBoxWidth, PollingPlaceTabData, CandidatesTabData ]
+    // 13. Les donnés dans le bas de page                 - [ Balise(s) HTML: InfoBoxWidth, PollingPlaceTabData, CandidatesTabData ]
     //
-    // 13. Les champs de la base de données               - [ Balise(s) HTML: DatabaseFields, CommentsInfoPopupFieldsCollection ]
+    // 14. Les champs de la base de données               - [ Balise(s) HTML: DatabaseFields, CommentsInfoPopupFieldsCollection ]
     //
-    // 14. Les URL pour le partage des cartes             - [ Balise(s) HTML: FacebookShareURL, TwitterShareURL, ShareByMailLink ]
-    // 14a.L'URL pour le service TinyURL                  - [ Balise(s) HTML: MapSharingOptions (set TinyURLServiceURL, TinyURLResponseAttribute) ]
-    // 14b.Les options de partage                         - [ Balise(s) HTML: TwitterStatus, TwitterHashtag, TwitterFollow, EmailSubject ]
-    // 14c.L'URL des réseaux sociaux                      - [ Balise(s) HTML: FacebookShareURL, TwitterShareURL ]
+    // 15. Les URL pour le partage des cartes             - [ Balise(s) HTML: FacebookShareURL, TwitterShareURL, ShareByMailLink ]
+    // 15a.L'URL pour le service TinyURL                  - [ Balise(s) HTML: MapSharingOptions (set TinyURLServiceURL, TinyURLResponseAttribute) ]
+    // 15b.Les options de partage                         - [ Balise(s) HTML: TwitterStatus, TwitterHashtag, TwitterFollow, EmailSubject ]
+    // 15c.L'URL des réseaux sociaux                      - [ Balise(s) HTML: FacebookShareURL, TwitterShareURL ]
 
     // ------------------------------------------------------------------------------------------------------------------------
     // CONFIGURATION GÉNÉRALE
     // ------------------------------------------------------------------------------------------------------------------------
     // Titre de l'application
     ApplicationName: /*Nom de l'application*/ "Localisateur de bureaux de scrutin", //Nom de l'application
-    WindowTitle: /*Title de la fenêtre*/ "Bureaux de scrutin", //CanMod
+    WindowTitle: /*Title de la fenêtre*/ "Bureaux de scrutin",
+	
+	// Logo de l'application
+	ApplicationIcon: "images/appIcon.png",
 
     // Contenu de l'écran de garde (l'écran qui s'affiche lors du lancement de l'application)
-    SplashScreenMessage: "<b>Localisateur de bureaux de scrutin</b> <br/> <hr/> <br/> Le <b>localisateur de bureau de scrutin</b> permet aux citoyens de trouver leur bureau de scrutin (soit ordinaire ou par anticipation), d’obtenir un itinéraire, d'obtenir de l’information au sujet de leur bureau, de faire des commentaires à propos des bureaux et d’obtenir une liste des candidats. Afin d’indiquer sont lieu de résidence, il est possible de cliquer sur la carte, de chercher par adresse ou d'utiliser l'outil de géolocalisation. L’application permet aussi au citoyens d’alterner entre les bureaux ordinaires (par default) et les bureaux de vote par anticipation.<br/><br/>",
+    SplashScreenMessage: "<strong>Localisateur de bureaux de scrutin</strong><br><hr><br>Le <strong>localisateur de bureau de scrutin</strong> permet aux citoyens de trouver leur bureau de scrutin (soit ordinaire ou par anticipation), d’obtenir un itinéraire, d'obtenir de l’information au sujet de leur bureau, de faire des commentaires à propos des bureaux et d’obtenir une liste des candidats. Afin d’indiquer sont lieu de résidence, il est possible de cliquer sur la carte, de chercher par adresse ou d'utiliser l'outil de géolocalisation. L’application permet aussi au citoyens d’alterner entre les bureaux ordinaires (par default) et les bureaux de vote par anticipation.<br><br>",
 
     // L'URL de la page/du portail d'aide
     HelpURL: "help.htm",
@@ -244,20 +249,20 @@ dojo.declare("js.Config", null, {
 
     // Configurez les paramètres du service localisateur d’adresse
     LocatorSettings: {
-		ShowSearchOnStartup: /*Montrer lors du lancement*/ false,
+		DisplayText: /*Texte d'affichage*/ "Trouver une adresse",
+		Example: /*Exemple*/ "Essayez un adresse tel que '12 Place Concord'",
 		MyLocationLabel: /*Étiquette Ma position*/ "ma position",
-		DefaultLocatorSymbol: /*Symbole de localisation*/ "images/RedPushpin.png",
-		SymbolSize: /*Taille du symbol*/ { width: 25, height: 25 },
-		DefaultValue: /*Valeur par default*/ "Saisisez un adresse",
-		LocatorParameters: /*Paramètre du localisateur*/ ["SingleLine"],
 		LocatorFields: /*Champs du localisateur*/ ["Address", "City", "Region", "Postal"],
+		DefaultLocatorSymbol: /*Symbole de localisation*/ "images/RedPushpin.png",
+		DefaultResultSymbol: /*Anneau du résultat*/ "images/ripple.png",
+		SymbolSize: /*Taille du symbol*/ { width: 25, height: 25 },
 		LocatorURL: /*URL du localisateur*/ "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer",
+		LocatorParamaters: /*Paramètre du localisateur*/ ["SingleLine"],
 		CandidateFields: /*Champs candidats*/ "Loc_name, Score, Match_addr",
-		FieldName: /*Nom du champ*/ "${Match_addr}",
+		DisplayFieldCML2: /*Champ d'affichage*/ "Match_addr",
+		AddressMatchScore: /*Score d'appariement minimum*/ 80,
 		LocatorFieldName: /*Nom du champ du localisateur*/ 'Loc_name',
 		LocatorFieldValues: /*Valeur du champ du localisateur*/ ["CAN.StreetName" , "CAN.PointAddress", "CAN.StreetAddress", "CAN.PostalExt"],
-		AddressMatchScore: /*Score d'appariement minimum*/ 80,
-		LocatorRipple: /*Anneau du résultat*/ { image:"images/ripple.png", width: 30, height: 30 },
 		//CanMod: Configurez l’étendue utilisé lors d’une recherche par adresse; saisissez un wkid de 0000 afin
         //de chercher l’Amérique du Nord en entier. CGS_WGS_1984 : Utilisez wkid 4326 et des dégrées décimaux;
         //WGS_1984_Web_Mercator : Utilisez wkid 3785 et des mètres; Aucun autre système accepté.
@@ -272,6 +277,17 @@ dojo.declare("js.Config", null, {
 	
 	// Saisissez l’URL du "Export Web Map Task" (fait partie des outils d’impression) – Laissez vide afin de désactiver l’impression de la carte
 	PrintingService: "http://yourserver:6080/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",
+	
+	// ------------------------------------------------------------------------------------------------------------------------
+	// BOUTON DE BASCULE DE LA LANGUE
+	// ------------------------------------------------------------------------------------------------------------------------
+	// Permet d'inclure un bouton dans la barre d'outils afin de changer d'application
+	LanguageButton: {
+		Enabled: /*Activé*/ false,
+		Image: "images/language_EN.png",
+		Title: /*Titre*/ "Afficher l'application en anglais",
+		AppURL: /*URL de l'application*/ "http://votresiteweb..."
+	},
 
     // ------------------------------------------------------------------------------------------------------------------------
     // ROUTAGE ET ITINÉAIRE
@@ -315,14 +331,14 @@ dojo.declare("js.Config", null, {
           {
               DirectionBox: /*Boite du routage*/ //ne pas enlever
                     {
-                        HeaderColor: /*Couleur de fond du titre*/ "#303030",
-                        Title: /*Titre*/ "<b>Iténéraire</b>",
+                        HeaderColor: /*Couleur de fond du titre*/ "#B4C8B4",
+                        Title: /*Titre*/ "<strong>Iténéraire</strong>",
                         ShowDirection: /*Afficher l'itinéaire*/ true
                     },
               DetailsBox: /*Boite des détails*/
                     {
                         HeaderColor: /*Coleur de fond du titre*/ "#303030",
-                        Title: /*Titre*/ "<b>Détails</b>",
+                        Title: /*Titre*/ "<strong>Détails</strong>",
 						//AttachmentDisplayField: /*Champ d'affichage des fichers joints*/ "Bulletin de vote:", //Optional
                         Data:
                               [
@@ -358,8 +374,8 @@ dojo.declare("js.Config", null, {
                     },
               ContactBox: /*Boite des coordonnés*/
                     {
-                        HeaderColor: "#303030",
-                        Title: "<b>Coordonnés</b>",
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Coordonnés</strong>",
                         Data:
                               [
                                         {
@@ -378,8 +394,8 @@ dojo.declare("js.Config", null, {
                     },
               CommentsBox: /*Boite des commentaires*/ //Ne pas enlever
                     {
-                        HeaderColor: "#303030",
-                        Title: "<b>Commentaires</b>"
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Commentaires</strong>"
                     }
           },
 
@@ -389,8 +405,8 @@ dojo.declare("js.Config", null, {
               Mayor:
                     {
                         ServiceUrl: "http://yourserver:6080/arcgis/rest/services/Divisions/MapServer/1",
-                        HeaderColor: "#303030",
-                        Title: "<b>Maire/Mairesse de la ville de Toronto</b>",
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Maire/Mairesse de la ville de Toronto</strong>",
                         Data:
                               [
                                         {
@@ -554,8 +570,8 @@ dojo.declare("js.Config", null, {
               Councillor:
                     {
                         ServiceUrl: "http://yourserver:6080/arcgis/rest/services/Divisions/MapServer/2",
-                        HeaderColor: "#303030",
-                        Title: "<b>Conseillers(ères) du quartier</b>",
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Conseillers(ères) du quartier</strong>",
                         Data:
                               [
                                         {
@@ -623,8 +639,8 @@ dojo.declare("js.Config", null, {
               TDSB:
                     {
                         ServiceUrl: "http://yourserver:6080/arcgis/rest/services/Divisions/MapServer/3",
-                        HeaderColor: "#303030",
-                        Title: "<b>Toronto District School Board Trustee</b>",
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Toronto District School Board Trustee</strong>",
                         Data:
                               [
                                         {
@@ -664,8 +680,8 @@ dojo.declare("js.Config", null, {
               TCDSB:
                     {
                         ServiceUrl: "http://yourserver:6080/arcgis/rest/services/Divisions/MapServer/4",
-                        HeaderColor: "#303030",
-                        Title: "<b>Toronto Catholic District School Board Trustee</b>",
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Toronto Catholic District School Board Trustee</strong>",
                         Data:
                               [
                                         {
@@ -709,8 +725,8 @@ dojo.declare("js.Config", null, {
               CSDCSO:
                     {
                         ServiceUrl: "http://yourserver:6080/arcgis/rest/services/Divisions/MapServer/5",
-                        HeaderColor: "#303030",
-                        Title: "<b>Conseil scolaire de district du Centre-Sud-Ouest</b>",
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Conseil scolaire de district du Centre-Sud-Ouest</strong>",
                         Data:
                               [
                                         {
@@ -734,8 +750,8 @@ dojo.declare("js.Config", null, {
               CSDCCS:
                     {
                         ServiceUrl: "http://yourserver:6080/arcgis/rest/services/Divisions/MapServer/6",
-                        HeaderColor: "#303030",
-                        Title: "<b>Conseil scolaire de district Catholique du Centre-Sud</b>",
+                        HeaderColor: "#B4C8B4",
+                        Title: "<strong>Conseil scolaire de district Catholique du Centre-Sud</strong>",
                         Data:
                               [
                                         {
