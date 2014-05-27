@@ -7,6 +7,14 @@ This ArcGIS JavaScript API application is highly configurable and works with the
 
 The voter can switch between regular (default) and advanced polling places.  There is also a print option to get a hard copy of the map, driving directions and the polling place details.
 
+### En français
+Vous trouverez la documentation en français dans la [gallérie d’ArcGIS Online](http://www.arcgis.com/home/item.html?id=7e8d018c531b4ec7a2ca70e56d6ed9b2).
+
+### Full Download
+If you want to deploy this application, please download the full zip file from the [ArcGIS Online item](http://www.arcgis.com/home/item.html?id=7e8d018c531b4ec7a2ca70e56d6ed9b2), which includes other necessary files such as help documentation, map documents, tools, and sample data.
+
+This GitHub repository is meant mainly for developers who wish to compare code between versions or those who wish to submit code.
+
 ### Try it Live
 
 A preview of this application is available in [English](http://apps.esri.ca/pollingplacelocator/ "Try it live") and [French](http://apps.esri.ca/pollingplacelocator/fr "Essayer l'application en français").
